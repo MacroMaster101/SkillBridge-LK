@@ -55,18 +55,22 @@ Candidate Skills → Relevant Job → Skill Match → Apply
 
 ## ✨ Main Features
 
-| # | Feature | Description |
+These map directly to the assignment's minimum software requirements:
+
+| # | Feature | Meets requirement |
 |---|---|---|
-| 1 | 🧑‍🎓 **Candidate onboarding** | Education, user type, skills and job preferences |
-| 2 | 🏢 **Employer profile** | Business name, category, location and contact details |
-| 3 | 📝 **Job posting** | Title, description, category, type, work mode, required skills |
-| 4 | 📃 **Job listing** | Browse all active vacancies |
-| 5 | 🔎 **Search & filters** | By keyword, category, job type, work mode and location |
-| 6 | 🎯 **Skill-match percentage** | `matched job skills ÷ total job skills × 100` |
-| 7 | 🚀 **Apply to a job** | One-click application from the job page |
-| 8 | 📊 **Candidate dashboard** | Track every application and its current status |
-| 9 | 👥 **Employer applicant view** | See applicants sorted by skill match |
-| 10 | 🔄 **Status updates** | Applied → Under Review → Shortlisted → Hired / Rejected |
+| 1 | 🧑‍🎓 **Candidate onboarding** | User-input form + input validation |
+| 2 | 🏢 **Employer profile** | User-input form + input validation |
+| 3 | 📝 **Job posting** | User-input form + input validation |
+| 4 | 📃 **Job listing** | Display / process information |
+| 5 | 🔎 **Search & filters** | Search / filter information |
+| 6 | 🎯 **Skill-match percentage** (`matched job skills ÷ total job skills × 100`) | Calculate information |
+| 7 | 🚀 **Apply to a job** | Functional feature #1 |
+| 8 | 📊 **Candidate dashboard** | Functional feature #2 (track status) |
+| 9 | 👥 **Employer applicant view** | Update / process information |
+| 10 | 🔄 **Status updates** (Applied → Under Review → Shortlisted → Hired / Rejected) | Update information |
+
+Together, features **7 (apply to a job)** and **10 (status updates)** are the two core functional features required by the brief; the rest layer on top of that loop.
 
 ### 📌 Current build status
 
@@ -90,7 +94,7 @@ Candidate Skills → Relevant Job → Skill Match → Apply
 | ⚙️ **Backend** | Node.js, Express 4, Zod |
 | 🗄️ **Database & Auth** | Supabase (PostgreSQL + Auth + Row-Level Security) |
 | 🎨 **Styling** | Custom CSS design system (public pages) + Tailwind CSS (app pages) |
-| ☁️ **Deployment** | Vercel (frontend) · Render/Railway (backend) · Supabase (database) |
+| ☁️ **Deployment** | Vercel (frontend) · Railway (backend) · Supabase (database) |
 
 ---
 
@@ -258,7 +262,7 @@ Run both in **two separate terminals**.
 | Piece | Host | Notes |
 |---|---|---|
 | 🖥️ Frontend | **Vercel** | Root Directory `client`, framework preset **Vite**, output `dist`. `client/vercel.json` adds the SPA rewrite so deep links like `/jobs/1` resolve. |
-| ⚙️ Backend | **Render / Railway** | Root Directory `server`, start command `npm start`. Set `CLIENT_URL` to the deployed frontend URL so CORS passes. |
+| ⚙️ Backend | **Railway** | Root Directory `server`, start command `npm start`. Set `CLIENT_URL` to the deployed frontend URL so CORS passes. Railway auto-detects Node and assigns a `PORT` — make sure `server` reads `process.env.PORT`. |
 | 🗄️ Database | **Supabase** | Run `schema.sql` then `seed.sql` in the SQL Editor. |
 
 Set the same environment variables in each host's dashboard — local `.env` files are not deployed.
@@ -304,18 +308,17 @@ Set the same environment variables in each host's dashboard — local `.env` fil
 
 ## 🤖 AI Tools Used
 
-<!-- TODO: Verify and extend. The assessment requires significant AI usage to be logged. -->
-
 **Declaration:**
 
-> AI assistants were used to support component scaffolding, API structure, debugging and sample data generation. The team reviewed, tested, modified and can explain all submitted code.
+> AI assistants (Claude and Cursor) were used to support component scaffolding, API structure, debugging and sample data generation. The team reviewed, tested, modified and can explain all submitted code.
 
 ### 📝 AI prompt log
 
 | AI Tool | Prompt (summary) | Purpose | How the output was checked / modified |
 |---|---|---|---|
 | Claude Code | "Redesign all public landing pages" | Public UI design system, landing / jobs / employers / auth pages | Reviewed in browser at desktop and mobile widths; verified `npm run build`, accessibility and responsive behaviour |
-| `_TBD_` | `_TBD_` | `_TBD_` | `_TBD_` |
+| Claude Code | "Build the candidate onboarding flow and skill-match display" | Candidate onboarding form, job feed match %, application dashboard | Reviewed component-by-component, checked validation messages, tested on mobile width |
+| Cursor | `_TBD_` | `_TBD_` | `_TBD_` |
 
 > 🔐 Do not include API keys, passwords or personal information in the prompt log.
 
@@ -325,8 +328,8 @@ Set the same environment variables in each host's dashboard — local `.env` fil
 
 <!-- TODO: Add the public URLs once deployed. -->
 
-- 🖥️ **Frontend:** `_TBD_`
-- ⚙️ **API health check:** `_TBD_/health`
+- 🖥️ **Frontend (Vercel):** `_TBD_`
+- ⚙️ **Backend / API health check (Railway):** `_TBD_/health`
 
 > ✅ Test the deployed link in an **incognito window** before submitting.
 
@@ -348,7 +351,7 @@ Set the same environment variables in each host's dashboard — local `.env` fil
 |---|---|
 | Clear landing page / main UI | ✅ Public landing page with search and skill-match demo |
 | Sri Lankan problem explained in-app | ✅ Problem framing throughout the public pages |
-| At least two functional features | ✅ Job posting/applying **and** skill-based matching |
+| At least two functional features | ✅ Apply to a job **and** track/update application status |
 | At least one user-input form | ✅ Onboarding, job posting, registration, search |
 | Input validation with friendly errors | ✅ Zod schemas on the API, HTML + form validation on the client |
 | Search / filter / calculate / process | ✅ Job search, filters, and skill-match calculation |
