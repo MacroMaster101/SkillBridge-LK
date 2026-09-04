@@ -63,5 +63,10 @@ export const applicationStatusSchema = z.object({
 });
 
 export const applySchema = z.object({
+
   message: z.string().trim().max(1000, 'Message is too long').optional(),
 });
+
+  message: z.string().max(1000).optional(),
+});
+

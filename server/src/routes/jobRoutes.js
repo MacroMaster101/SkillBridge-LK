@@ -7,12 +7,20 @@ import * as applicationController from '../controllers/applicationController.js'
 
 const router = Router();
 
-// Browsing is public — the landing and jobs pages rely on it without a session.
+// Public job browsing
 router.get('/', jobController.getJobs);
 router.get('/:id', jobController.getJobById);
 
+// Employer — create a job
+// Browsing is public — the landing and jobs pages rely on it without a session.
+router.get('/', jobController.getJobs);
+router.get('/:id', jobController.getJobById);
 router.post('/', authenticate, requireRole('employer'), validate(jobSchema), jobController.createJob);
+
+// Feature 4 — Candidate applies to a job
 router.post('/:jobId/apply', authenticate, requireRole('candidate'), applicationController.applyToJob);
+
+// Employer — view applicants for a job
 router.get('/:jobId/applications', authenticate, requireRole('employer'), applicationController.getJobApplications);
 
 export default router;
