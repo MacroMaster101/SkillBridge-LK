@@ -15,7 +15,7 @@ export async function listJobs(filters, candidateId) {
   if (filters.job_type)  query = query.eq("job_type", filters.job_type);
   if (filters.work_mode) query = query.eq("work_mode", filters.work_mode);
   if (filters.location)  query = query.ilike("location", `%${filters.location}%`);
-  if (filters.q)         query = query.ilike("title", `%${filters.q}%`);
+
 
   const { data, error } = await query.order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
