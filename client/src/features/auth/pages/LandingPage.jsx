@@ -1,96 +1,191 @@
-import { Link } from 'react-router-dom';
-import Button from '../../../components/Button';
+import { Fragment, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Action, Eyebrow, Icon, MatchBoard, OpportunityCard, Trilingual } from '../../../components/PublicUI';
+import { JOB_CATEGORIES } from '../../../constants';
+import { publicJobs } from '../../jobs/data/publicJobs';
+
+const CATEGORIES = [
+  { name: 'Software / IT', icon: 'code', note: 'Web, mobile and support roles', color: 'lavender' },
+  { name: 'Graphic Design', icon: 'design', note: 'Brand, social and layout work', color: 'peach' },
+  { name: 'Marketing', icon: 'chart', note: 'Content, campaigns and social', color: 'lime' },
+  { name: 'Accounting / Finance', icon: 'briefcase', note: 'Bookkeeping and accounts roles', color: 'blue' },
+];
+
+const AUDIENCE = ['Undergraduates', 'Diploma & HND holders', 'Recent graduates', 'Career changers'];
+
+const STEPS = [
+  {
+    icon: 'people',
+    title: 'Add your skills',
+    text: 'Tell us your education, the skills you already have, and the kind of work you are looking for. It takes about three minutes.',
+  },
+  {
+    icon: 'spark',
+    title: 'See your match',
+    text: 'Every role shows how much of its required skills you already have — and names the ones you would be learning on the job.',
+  },
+  {
+    icon: 'arrow',
+    title: 'Apply and track',
+    text: 'Apply in a couple of clicks, then follow each application from submitted, to under review, to shortlisted.',
+  },
+];
 
 export default function LandingPage() {
+  const [search, setSearch] = useState('');
+  const navigate = useNavigate();
+
+  const submitSearch = (event) => {
+    event.preventDefault();
+    const term = search.trim();
+    navigate(`/jobs${term ? `?search=${encodeURIComponent(term)}` : ''}`);
+  };
+
   return (
-    <div>
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-700 to-brand-900 px-4 py-20 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Find opportunities that match what you can actually do.
-          </h1>
-          <p className="mt-6 text-lg text-brand-100">
-            SkillBridge LK connects Sri Lankan students, diploma holders, and early-career
-            job seekers with small-business opportunities tailored to their skills.
-          </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link to="/jobs">
-              <Button size="lg" className="min-w-[160px] bg-white text-brand-700 hover:bg-brand-50">
-                Find Jobs
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button variant="secondary" size="lg" className="min-w-[160px] border-white/30 bg-transparent text-white hover:bg-white/10">
-                Post a Job
-              </Button>
-            </Link>
+    <>
+      <section className="sb-hero">
+        <div className="sb-container sb-hero-grid">
+          <div className="sb-hero-copy">
+            <Eyebrow>Sri Lanka · Early-career roles</Eyebrow>
+            <h1>Entry-level should mean <em>entry-level.</em></h1>
+            <p>
+              SkillBridge LK matches the skills you actually have to internships,
+              part-time work and first roles at small Sri Lankan businesses — and
+              shows you where you stand before you apply.
+            </p>
+
+            <form className="sb-search" onSubmit={submitSearch}>
+              <Icon name="search" />
+              <label className="sr-only" htmlFor="hero-search">Search by job title, skill or company</label>
+              <input
+                id="hero-search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Job title, skill or company"
+              />
+              <button className="sb-button" type="submit">Search <Icon size={17} /></button>
+            </form>
+
+            <div className="sb-popular">
+              <span>Common starts:</span>
+              <Link to="/jobs?jobType=Internship">Internship</Link>
+              <Link to="/jobs?jobType=Part-time">Part-time</Link>
+              <Link to="/jobs?workMode=Remote">Remote</Link>
+            </div>
+
+            <div className="sb-hero-foot">
+              <Icon name="spark" />
+              <Trilingual si="ඔබේ ඊළඟ පියවර" ta="உங்கள் அடுத்த படி" en="Your next step" />
+            </div>
           </div>
+
+          <MatchBoard />
         </div>
       </section>
 
-      {/* Problem */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 className="text-center text-3xl font-bold text-gray-900">The Problem</h2>
-        <div className="mt-10 grid gap-8 md:grid-cols-2">
-          <div className="rounded-xl border bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-brand-700">For Candidates</h3>
-            <ul className="mt-4 space-y-2 text-gray-600">
-              <li>• Hard to find jobs relevant to current skills</li>
-              <li>• Too many unrelated vacancies on large platforms</li>
-              <li>• No simple way to track multiple applications</li>
-            </ul>
-          </div>
-          <div className="rounded-xl border bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-brand-700">For Employers</h3>
-            <ul className="mt-4 space-y-2 text-gray-600">
-              <li>• Small businesses lack easy recruitment tools</li>
-              <li>• Difficult to reach suitable junior candidates</li>
-              <li>• Applications become hard to organize manually</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-center text-3xl font-bold text-gray-900">How It Works</h2>
-          <div className="mt-10 grid gap-8 md:grid-cols-3">
-            {[
-              { step: '1', title: 'Create Profile', desc: 'Sign up and add your skills and preferences.' },
-              { step: '2', title: 'Get Matched', desc: 'Browse jobs with skill-match percentages.' },
-              { step: '3', title: 'Apply & Track', desc: 'Apply in one click and track your status.' },
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-xl font-bold text-brand-700">
-                  {item.step}
-                </div>
-                <h3 className="mt-4 text-lg font-semibold">{item.title}</h3>
-                <p className="mt-2 text-gray-600">{item.desc}</p>
-              </div>
+      <section className="sb-stops" aria-label="Who SkillBridge LK is for">
+        <div className="sb-container">
+          <p className="sb-stops-label">Built for</p>
+          <p className="sb-stops-line">
+            {AUDIENCE.map((group, index) => (
+              <Fragment key={group}>
+                {index > 0 && <i aria-hidden="true" />}
+                <span>{group}</span>
+              </Fragment>
             ))}
+          </p>
+        </div>
+      </section>
+
+      <section className="sb-section sb-container">
+        <div className="sb-section-heading">
+          <div>
+            <Eyebrow>Browse by field</Eyebrow>
+            <h2>Where do your skills fit?</h2>
+          </div>
+          <Link className="sb-text-link" to="/jobs">
+            All {JOB_CATEGORIES.length} categories <Icon size={18} />
+          </Link>
+        </div>
+        <div className="sb-category-grid">
+          {CATEGORIES.map((category) => (
+            <Link
+              className="sb-category"
+              key={category.name}
+              to={`/jobs?category=${encodeURIComponent(category.name)}`}
+            >
+              <span className={`sb-tile-icon ${category.color}`} aria-hidden="true">
+                <Icon name={category.icon} size={24} />
+              </span>
+              <h3>{category.name}</h3>
+              <p>{category.note}</p>
+              <Icon />
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="sb-opportunities">
+        <div className="sb-container sb-section">
+          <div className="sb-section-heading">
+            <div>
+              <Eyebrow>Sample listings</Eyebrow>
+              <h2>The kind of roles you will find here.</h2>
+              <p>Small teams and local businesses, hiring for the start of a career rather than the middle of one.</p>
+            </div>
+            <Action to="/jobs" secondary>Browse all <Icon size={17} /></Action>
+          </div>
+          <p className="sb-preview-label">Sample data · Not live vacancies</p>
+          <div className="sb-job-grid">
+            {publicJobs.slice(0, 3).map((job) => <OpportunityCard key={job.id} job={job} />)}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-brand-50 px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Ready to get started?</h2>
-          <p className="mt-4 text-gray-600">
-            Join SkillBridge LK today — whether you&apos;re looking for your next opportunity or hiring junior talent.
+      <section id="how-it-works" className="sb-section sb-container">
+        <div className="sb-section-heading">
+          <div>
+            <Eyebrow>How it works</Eyebrow>
+            <h2>Three steps from profile to application.</h2>
+          </div>
+          <p className="sb-heading-note">
+            You do not need a CV full of experience. You need a clear picture of
+            what you can already do, and a way to show it.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link to="/register">
-              <Button size="lg">Create Account</Button>
-            </Link>
-            <Link to="/jobs">
-              <Button variant="secondary" size="lg">Browse Jobs</Button>
-            </Link>
+        </div>
+        <div className="sb-steps">
+          {STEPS.map((step) => (
+            <article key={step.title}>
+              <span className="sb-step-marker" aria-hidden="true" />
+              <Icon name={step.icon} size={26} />
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="sb-bridge" aria-label="For employers">
+        <img src="/bridge.webp" alt="" width="1536" height="864" />
+        <div className="sb-container">
+          <div className="sb-bridge-copy">
+            <Eyebrow>For employers</Eyebrow>
+            <h2>Hiring your first junior?</h2>
+            <p>
+              Post a vacancy, list the skills that actually matter for it, and see
+              applicants alongside how closely they match. No recruitment team required.
+            </p>
+            <Action to="/employers">See how hiring works <Icon size={18} /></Action>
           </div>
         </div>
       </section>
-    </div>
+
+      <section className="sb-final-cta sb-container">
+        <Eyebrow>Get started</Eyebrow>
+        <h2>See where you stand.</h2>
+        <Action to="/register?role=candidate">Create your profile <Icon size={18} /></Action>
+        <p>Add your skills once, and every role you open shows you the match.</p>
+      </section>
+    </>
   );
 }
