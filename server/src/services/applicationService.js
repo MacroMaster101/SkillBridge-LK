@@ -4,6 +4,128 @@ import { assertJobOwnership, assertApplicationOwnership } from '../utils/employe
 import { calculateSkillMatch, getMatchedAndMissingSkills } from '../utils/skillMatch.js';
 import { getJobSkills } from './jobService.js';
 
+// Candidate applies to a job
+export async function applyToJob(jobId, candidateId, message = '') {
+  const { data: job, error: jobError } = await supabase
+    .from('jobs')
+    .select('id, status')
+    .eq('id', jobId)
+    .maybeSingle();
+
+  if (jobError) {
+    throw new AppError(500, jobError.message);
+  }
+
+  if (!job) {
+    throw new AppError(404, 'Job not found.');
+  }
+
+  if (job.status !== 'ACTIVE') {
+    throw new AppError(400, 'This job is no longer active.');
+  }
+
+  const { data: existing } = await supabase
+    .from('applications')
+    .select('id')
+    .eq('job_id', jobId)
+    .eq('candidate_id', candidateId)
+    .maybeSingle();
+
+  if (existing) {
+    throw new AppError(409, 'You have already applied for this job.');
+  }
+
+  const { data, error } = await supabase
+    .from('applications')
+    .insert({
+      job_id: jobId,
+      candidate_id: candidateId,
+      message: message ?? null,
+      status: 'APPLIED',
+    })
+    .select('id, job_id, candidate_id, status, message, applied_at')
+    .single();
+
+  if (error) {
+    if (error.code === '23505') {
+      throw new AppError(409, 'You have already applied for this job.');
+    }
+    throw new AppError(500, error.message);
+  }
+
+  return {
+    id: data.id,
+    jobId: data.job_id,
+    candidateId: data.candidate_id,
+    status: data.status,
+    message: data.message,
+    appliedAt: data.applied_at,
+  };
+}
+
+// Candidate application dashboard
+export async function getMyApplications(candidateId) {
+  const { data, error } = await supabase
+    .from('applications')
+    .select(`
+      id,
+      status,
+      message,
+      applied_at,
+      jobs (
+        id,
+        title,
+        category,
+        job_type,
+        location,
+        work_mode,
+        employers ( company_name ),
+        job_skills ( skills ( name ) )
+      )
+    `)
+    .eq('candidate_id', candidateId)
+    .order('applied_at', { ascending: false });
+
+  if (error) {
+    throw new AppError(500, error.message);
+  }
+
+  const { data: candidateSkills } = await supabase
+    .from('candidate_skills')
+    .select('skills ( name )')
+    .eq('user_id', candidateId);
+
+  const candidateSkillNames = (candidateSkills || [])
+    .map((entry) => entry.skills?.name)
+    .filter(Boolean);
+
+  return (data || []).map((app) => {
+    const job = app.jobs;
+    const jobSkillNames = (job?.job_skills || [])
+      .map((entry) => entry.skills?.name)
+      .filter(Boolean);
+
+    return {
+      id: app.id,
+      status: app.status,
+      appliedAt: app.applied_at,
+      jobTitle: job?.title || 'Unknown role',
+      company: job?.employers?.company_name || '',
+      matchPercentage: calculateSkillMatch(candidateSkillNames, jobSkillNames),
+      job: {
+        id: job?.id,
+        title: job?.title,
+        company: job?.employers?.company_name ?? 'Unknown',
+        category: job?.category,
+        jobType: job?.job_type,
+        location: job?.location,
+        workMode: job?.work_mode,
+      },
+    };
+  });
+}
+
+// Employer — list applicants for one of their jobs
 export async function getJobApplications(jobId, ownerId) {
   await assertJobOwnership(jobId, ownerId);
 
@@ -59,104 +181,7 @@ export async function getJobApplications(jobId, ownerId) {
   });
 }
 
-export async function applyToJob(jobId, candidateId, message = '') {
-  const { data: job, error: jobError } = await supabase
-    .from('jobs')
-    .select('id, status')
-    .eq('id', jobId)
-    .maybeSingle();
-
-  if (jobError) {
-    throw new AppError(500, jobError.message);
-  }
-
-  if (!job || job.status !== 'ACTIVE') {
-    throw new AppError(404, 'Job not found');
-  }
-
-  const { data: existing } = await supabase
-    .from('applications')
-    .select('id')
-    .eq('job_id', jobId)
-    .eq('candidate_id', candidateId)
-    .maybeSingle();
-
-  if (existing) {
-    throw new AppError(409, 'You have already applied to this role');
-  }
-
-  const { data, error } = await supabase
-    .from('applications')
-    .insert({
-      job_id: jobId,
-      candidate_id: candidateId,
-      message: message || null,
-      status: 'APPLIED',
-    })
-    .select('id, job_id, candidate_id, status, message, applied_at')
-    .single();
-
-  if (error) {
-    throw new AppError(500, error.message);
-  }
-
-  return {
-    id: data.id,
-    jobId: data.job_id,
-    candidateId: data.candidate_id,
-    status: data.status,
-    message: data.message,
-    appliedAt: data.applied_at,
-  };
-}
-
-export async function getMyApplications(candidateId) {
-  const { data, error } = await supabase
-    .from('applications')
-    .select(`
-      id,
-      status,
-      applied_at,
-      jobs (
-        id,
-        title,
-        employers ( company_name ),
-        job_skills ( skills ( name ) )
-      )
-    `)
-    .eq('candidate_id', candidateId)
-    .order('applied_at', { ascending: false });
-
-  if (error) {
-    throw new AppError(500, error.message);
-  }
-
-  const { data: candidateSkills } = await supabase
-    .from('candidate_skills')
-    .select('skills ( name )')
-    .eq('user_id', candidateId);
-
-  const candidateSkillNames = (candidateSkills || [])
-    .map((entry) => entry.skills?.name)
-    .filter(Boolean);
-
-  return (data || []).map((app) => {
-    const job = app.jobs;
-    const jobSkillNames = (job?.job_skills || [])
-      .map((entry) => entry.skills?.name)
-      .filter(Boolean);
-
-    return {
-      id: app.id,
-      jobTitle: job?.title || 'Unknown role',
-      company: job?.employers?.company_name || '',
-      status: app.status,
-      appliedAt: app.applied_at,
-      matchPercentage: calculateSkillMatch(candidateSkillNames, jobSkillNames),
-    };
-  });
-}
-
+// Employer — update an application's status
 export async function updateApplicationStatus(applicationId, ownerId, status) {
   await assertApplicationOwnership(applicationId, ownerId);
 

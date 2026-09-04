@@ -1,11 +1,17 @@
+import { applySchema } from '../validators/schemas.js';
 import * as applicationService from '../services/applicationService.js';
 
 export async function applyToJob(req, res, next) {
+  const parsed = applySchema.safeParse(req.body || {});
+  if (!parsed.success) {
+    return res.status(400).json({ message: parsed.error.issues[0].message });
+  }
+
   try {
     const application = await applicationService.applyToJob(
       req.params.jobId,
       req.user.id,
-      req.body.message,
+      parsed.data.message,
     );
     res.status(201).json(application);
   } catch (err) {

@@ -61,3 +61,7 @@ export const jobSchema = z.object({
 export const applicationStatusSchema = z.object({
   status: z.enum(['APPLIED', 'UNDER_REVIEW', 'SHORTLISTED', 'REJECTED', 'HIRED']),
 });
+
+export const applySchema = z.object({
+  message: z.string().trim().max(1000, 'Message is too long').optional(),
+});
