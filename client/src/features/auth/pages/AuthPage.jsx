@@ -1,6 +1,14 @@
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Eyebrow, Icon } from '../../../components/PublicUI';
+import {
+  signUp,
+  signIn,
+  ensureProfile,
+  getHomeRoute,
+  getPostRegisterRoute,
+} from '../services/authService';
+import { isSupabaseConfigured } from '../../../services/supabase';
 
 const ROLES = [
   { value: 'candidate', label: 'Find work', icon: 'people' },
@@ -8,20 +16,66 @@ const ROLES = [
 ];
 
 export default function AuthPage({ register = false }) {
+  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const role = params.get('role') === 'employer' ? 'employer' : 'candidate';
   const [showPassword, setShowPassword] = useState(false);
   const [feedback, setFeedback] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const hiring = register && role === 'employer';
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setFeedback(
-      register
-        ? 'Accounts are not connected yet in this preview. Browse the sample opportunities in the meantime.'
-        : 'Log in is not connected yet in this preview. You can browse the sample opportunities without an account.',
-    );
+    setError('');
+    setFeedback('');
+
+    if (!isSupabaseConfigured) {
+      setError('Authentication is not configured. Add Supabase keys to client/.env');
+      return;
+    }
+
+    const formData = new FormData(event.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const fullName = formData.get('fullName');
+
+    setLoading(true);
+
+    try {
+      if (register) {
+        const { session, user } = await signUp({
+          email,
+          password,
+          fullName,
+          role,
+        });
+
+        if (session && user) {
+          const profile = await ensureProfile(user, { fullName, role });
+          navigate(getPostRegisterRoute(profile.role));
+          return;
+        }
+
+        setFeedback('Account created. Check your email to confirm, then log in.');
+        return;
+      }
+
+      const { user } = await signIn({ email, password });
+
+      if (!user) {
+        setError('Login failed. Please try again.');
+        return;
+      }
+
+      const profile = await ensureProfile(user);
+      navigate(getHomeRoute(profile.role));
+    } catch (err) {
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -76,7 +130,7 @@ export default function AuthPage({ register = false }) {
                     name="accountRole"
                     value={item.value}
                     checked={role === item.value}
-                    onChange={() => { setParams({ role: item.value }, { replace: true }); setFeedback(''); }}
+                    onChange={() => { setParams({ role: item.value }, { replace: true }); setFeedback(''); setError(''); }}
                   />
                   <Icon name={item.icon} />
                   <span>{item.label}</span>
@@ -127,25 +181,36 @@ export default function AuthPage({ register = false }) {
 
           {register && <p className="sb-field-hint">Use at least 8 characters.</p>}
 
-          {feedback && (
-            <p className="sb-form-feedback" role="status">
-              {feedback} <Link to="/jobs">Browse opportunities →</Link>
+          {error && (
+            <p className="sb-form-feedback sb-form-error" role="alert">
+              {error}
             </p>
           )}
 
-          <button className="sb-button sb-auth-submit" type="submit">
-            {register ? 'Create account' : 'Log in'}
-            <Icon size={18} />
+          {feedback && (
+            <p className="sb-form-feedback" role="status">
+              {feedback}
+            </p>
+          )}
+
+          <button className="sb-button sb-auth-submit" type="submit" disabled={loading}>
+            {loading ? 'Please wait…' : register ? 'Create account' : 'Log in'}
+            {!loading && <Icon size={18} />}
           </button>
-          <p className="sb-preview-form-note">Preview build · Accounts not connected yet</p>
         </form>
 
         <p className="sb-auth-switch">
           {register ? 'Already have an account? ' : 'New here? '}
-          <Link to={register ? '/login' : '/register'}>
+          <Link to={register ? `/login${role === 'employer' ? '?role=employer' : ''}` : `/register${role === 'employer' ? '?role=employer' : ''}`}>
             {register ? 'Log in' : 'Create an account'}
           </Link>
         </p>
+
+        {!register && (
+          <p className="sb-auth-switch">
+            Platform admin? <Link to="/admin/login">Super admin login</Link>
+          </p>
+        )}
 
         <p className="sb-auth-bottom">
           <Icon name="spark" size={17} />

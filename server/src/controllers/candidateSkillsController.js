@@ -1,25 +1,15 @@
-import { supabase } from "../config/supabase.js";
+import { updateSkillsSchema } from "../validators/candidate.js";
+import { setCandidateSkills } from "../services/candidateService.js";
 
 export async function updateSkills(req, res) {
+  const parsed = updateSkillsSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ message: parsed.error.issues[0].message });
+  }
   try {
-    const { skills } = req.body;
-    const userId = req.user.id;
-
-    if (!Array.isArray(skills)) {
-      return res.status(400).json({ error: "Skills must be an array" });
-    }
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .update({ skills })
-      .eq("id", userId)
-      .select();
-
-    if (error) throw error;
-
-    res.json({ message: "Skills updated", data: data[0] });
-  } catch (error) {
-    console.error("Error updating skills:", error);
-    res.status(500).json({ error: error.message });
+    const profile = await setCandidateSkills(req.user.id, parsed.data.skillIds);
+    res.json(profile);
+  } catch (e) {
+    res.status(500).json({ message: "Unable to save skills." });
   }
 }

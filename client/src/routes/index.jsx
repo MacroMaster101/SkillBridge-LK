@@ -4,6 +4,7 @@ import RequireCandidate from '../components/RequireCandidate';
 import PublicLayout from '../layouts/PublicLayout';
 import CandidateLayout from '../layouts/CandidateLayout';
 import EmployerLayout from '../layouts/EmployerLayout';
+import AdminLayout from '../layouts/AdminLayout';
 
 // Candidate Pages
 import Onboarding from '../pages/Onboarding';
@@ -16,6 +17,7 @@ import Dashboard from '../pages/Dashboard';
 import LandingPage from '../features/auth/pages/LandingPage';
 import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
+import AdminLoginPage from '../features/auth/pages/AdminLoginPage';
 import EmployersPage from '../features/auth/pages/EmployersPage';
 
 // Job pages (shared)
@@ -29,6 +31,9 @@ import EmployerDashboardPage from '../features/employer/pages/EmployerDashboardP
 import PostJobPage from '../features/employer/pages/PostJobPage';
 import EmployerJobsPage from '../features/employer/pages/EmployerJobsPage';
 import ApplicantsPage from '../features/employer/pages/ApplicantsPage';
+
+// Admin pages
+import AdminDashboardPage from '../features/admin/pages/AdminDashboardPage';
 
 // Candidate-only layout
 function CandidateSideLayout() {
@@ -48,6 +53,7 @@ export default function AppRoutes() {
         <Route index element={<LandingPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="admin/login" element={<AdminLoginPage />} />
         <Route path="employers" element={<EmployersPage />} />
         <Route path="jobs" element={<JobsPage />} />
         <Route path="jobs/:id" element={<JobDetailsPage />} />
@@ -105,6 +111,11 @@ export default function AppRoutes() {
         <Route path="post-job" element={<PostJobPage />} />
         <Route path="jobs" element={<EmployerJobsPage />} />
         <Route path="jobs/:jobId/applicants" element={<ApplicantsPage />} />
+      </Route>
+
+      {/* Admin routes */}
+      <Route path="admin" element={<AdminLayout />}>
+        <Route path="dashboard" element={<AdminDashboardPage />} />
       </Route>
     </Routes>
   );
