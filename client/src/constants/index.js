@@ -48,4 +48,5 @@ export const STATUS_LABELS = {
 export const ROLES = {
   CANDIDATE: 'candidate',
   EMPLOYER: 'employer',
+  ADMIN: 'admin',
 };
