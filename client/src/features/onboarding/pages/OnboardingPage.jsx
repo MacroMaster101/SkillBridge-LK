@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../../components/Button';
-import LoadingSpinner from '../../../components/LoadingSpinner';
 import SkillPicker from '../../../components/SkillPicker';
 import {
   CheckChip, ErrorNote, Icon, InfoNote, PageHeader, SectionCard, SelectField, TextField,
@@ -27,7 +26,6 @@ export default function OnboardingPage() {
   const { profile } = useAuth();
   const [skillsCatalog, setSkillsCatalog] = useState([]);
   const [savedProfile, setSavedProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [errors, setErrors] = useState({});
@@ -44,32 +42,39 @@ export default function OnboardingPage() {
   const [jobTypes, toggleJobType, setJobTypes] = useToggleSet([]);
 
   useEffect(() => {
-    Promise.all([
-      api.get('/skills'),
-      candidateService.getMe().catch(() => null),
-    ])
-      .then(([skillsRes, profileRes]) => {
-        setSkillsCatalog(skillsRes.data || []);
+    let cancelled = false;
+
+    api.get('/skills')
+      .then((skillsRes) => {
+        if (!cancelled) setSkillsCatalog(skillsRes.data || []);
+      })
+      .catch(() => {});
+
+    candidateService.getMe()
+      .then((profileRes) => {
+        if (cancelled) return;
         const data = profileRes?.data;
-        if (data) {
-          setSavedProfile(data);
-          setForm({
-            fullName: data.full_name || profile?.full_name || '',
-            userType: USER_TYPES.includes(data.user_type) ? data.user_type : USER_TYPES[0],
-            educationLevel: data.education_level || '',
-            fieldOfStudy: data.field_of_study || '',
-            location: data.location || '',
-            preferredWorkMode: data.preferred_work_mode || '',
-          });
-          if (data.skills?.length) {
-            setSkills(data.skills.map((s) => s.name));
-          }
-          if (data.preferred_job_types?.length) {
-            setJobTypes(data.preferred_job_types);
-          }
+        if (!data) return;
+
+        setSavedProfile(data);
+        setForm({
+          fullName: data.full_name || profile?.full_name || '',
+          userType: USER_TYPES.includes(data.user_type) ? data.user_type : USER_TYPES[0],
+          educationLevel: data.education_level || '',
+          fieldOfStudy: data.field_of_study || '',
+          location: data.location || '',
+          preferredWorkMode: data.preferred_work_mode || '',
+        });
+        if (data.skills?.length) {
+          setSkills(data.skills.map((s) => s.name));
+        }
+        if (data.preferred_job_types?.length) {
+          setJobTypes(data.preferred_job_types);
         }
       })
-      .finally(() => setLoading(false));
+      .catch(() => {});
+
+    return () => { cancelled = true; };
   }, [profile?.full_name, setSkills, setJobTypes]);
 
   const update = (name, value) => {
@@ -113,10 +118,6 @@ export default function OnboardingPage() {
       setSubmitting(false);
     }
   };
-
-  if (loading) {
-    return <LoadingSpinner className="py-16" size="lg" />;
-  }
 
   const isEditing = Boolean(savedProfile?.onboarding_completed);
   const skillOptions = skillsCatalog.map((skill) => skill.name);

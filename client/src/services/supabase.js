@@ -17,24 +17,37 @@ export const supabase =
 
 export const isSupabaseConfigured = Boolean(supabase);
 
+let cachedAccessToken = localStorage.getItem('access_token');
+
 export function syncAuthSession(session) {
-  if (session?.access_token) {
-    localStorage.setItem('access_token', session.access_token);
+  cachedAccessToken = session?.access_token ?? null;
+  if (cachedAccessToken) {
+    localStorage.setItem('access_token', cachedAccessToken);
     return;
   }
   localStorage.removeItem('access_token');
 }
 
+export function getCachedAccessToken() {
+  return cachedAccessToken;
+}
+
 export async function getAccessToken() {
+  if (cachedAccessToken) {
+    return cachedAccessToken;
+  }
+
   if (!supabase) {
     return localStorage.getItem('access_token');
   }
 
   const { data: { session } } = await supabase.auth.getSession();
-  if (session?.access_token) {
-    syncAuthSession(session);
-    return session.access_token;
-  }
+  syncAuthSession(session);
+  return cachedAccessToken;
+}
 
-  return null;
+if (supabase) {
+  supabase.auth.onAuthStateChange((_event, session) => {
+    syncAuthSession(session);
+  });
 }

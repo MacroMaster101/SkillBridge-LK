@@ -11,6 +11,7 @@ import {
 import { isSupabaseConfigured } from '../../../services/supabase';
 import { authCandidateRegisterSchema, authLoginSchema, authRegisterSchema } from '../../../lib/validation';
 import { isPasswordValid, PasswordValidation } from '../components/PasswordValidation';
+import { useAuth } from '../../../hooks/useAuth';
 
 const ROLES = [
   { value: 'candidate', label: 'Find work', icon: 'people' },
@@ -19,6 +20,7 @@ const ROLES = [
 
 export default function AuthPage({ register = false }) {
   const navigate = useNavigate();
+  const { completeAuth } = useAuth();
   const [params, setParams] = useSearchParams();
   const role = params.get('role') === 'employer' ? 'employer' : 'candidate';
   const [showPassword, setShowPassword] = useState(false);
@@ -69,6 +71,7 @@ export default function AuthPage({ register = false }) {
 
         if (session && user) {
           const profile = await ensureProfile(user, { fullName, role });
+          completeAuth(user, profile);
           navigate(getPostRegisterRoute(profile.role));
           return;
         }
@@ -85,6 +88,7 @@ export default function AuthPage({ register = false }) {
       }
 
       const profile = await ensureProfile(user);
+      completeAuth(user, profile);
       navigate(getHomeRoute(profile.role));
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');

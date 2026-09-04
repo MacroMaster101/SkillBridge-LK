@@ -117,16 +117,21 @@ async function ensureCandidateProfile(userId) {
   return data;
 }
 
-/**
- * Returns the user's profile, creating one if the signup trigger did not run.
- * Also creates candidate_profiles row when role is candidate.
- */
-export async function ensureProfile(user, fallback = {}) {
-  let profile = await fetchProfile(user.id);
+const profileRequests = new Map();
+
+async function resolveProfile(user, fallback = {}) {
+  const roleHint = user.user_metadata?.role || fallback.role || ROLES.CANDIDATE;
+
+  const [existingProfile, existingCandidate] = await Promise.all([
+    fetchProfile(user.id),
+    roleHint === ROLES.CANDIDATE ? fetchCandidateProfile(user.id) : Promise.resolve(null),
+  ]);
+
+  let profile = existingProfile;
 
   if (!profile) {
     const fullName = user.user_metadata?.full_name || fallback.fullName || 'User';
-    const role = user.user_metadata?.role || fallback.role || ROLES.CANDIDATE;
+    const role = roleHint;
 
     const { data, error } = await supabase
       .from('profiles')
@@ -154,9 +159,27 @@ export async function ensureProfile(user, fallback = {}) {
     profile = data;
   }
 
-  if (profile.role === ROLES.CANDIDATE) {
+  if (profile.role === ROLES.CANDIDATE && !existingCandidate) {
     await ensureCandidateProfile(user.id);
   }
 
   return profile;
+}
+
+/**
+ * Returns the user's profile, creating one if the signup trigger did not run.
+ * Also creates candidate_profiles row when role is candidate.
+ */
+export async function ensureProfile(user, fallback = {}) {
+  const existingRequest = profileRequests.get(user.id);
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  const request = resolveProfile(user, fallback).finally(() => {
+    profileRequests.delete(user.id);
+  });
+
+  profileRequests.set(user.id, request);
+  return request;
 }

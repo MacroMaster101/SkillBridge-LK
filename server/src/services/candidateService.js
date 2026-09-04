@@ -1,21 +1,35 @@
 import { supabase } from "../config/supabase.js";
 
 export async function getCandidateProfile(userId) {
-  const { data: profile } = await supabase
-    .from("profiles").select("full_name, role").eq("id", userId).single();
-
-  const { data: candidate } = await supabase
-    .from("candidate_profiles").select("*").eq("user_id", userId).single();
-
-  const { data: skills } = await supabase
-    .from("candidate_skills")
-    .select("skills(id, name)")
-    .eq("user_id", userId);
+  const [{ data: profile }, { data: candidate }, { data: skills }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("full_name, role")
+      .eq("id", userId)
+      .maybeSingle(),
+    supabase
+      .from("candidate_profiles")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle(),
+    supabase
+      .from("candidate_skills")
+      .select("skills(id, name)")
+      .eq("user_id", userId),
+  ]);
 
   return {
-    ...profile,
-    ...candidate,
-    skills: (skills || []).map((r) => r.skills),
+    full_name: profile?.full_name || "",
+    role: profile?.role || "candidate",
+    user_id: userId,
+    user_type: candidate?.user_type || "",
+    education_level: candidate?.education_level || "",
+    field_of_study: candidate?.field_of_study || "",
+    location: candidate?.location || "",
+    preferred_work_mode: candidate?.preferred_work_mode || "",
+    preferred_job_types: candidate?.preferred_job_types || [],
+    onboarding_completed: candidate?.onboarding_completed ?? false,
+    skills: (skills || []).map((row) => row.skills).filter(Boolean),
   };
 }
 
