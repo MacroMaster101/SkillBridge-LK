@@ -4,14 +4,13 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../hooks/useAuth';
 import { ROLES } from '../constants';
 
-const employerLinks = [
-  { to: '/employer/dashboard', label: 'Dashboard' },
-  { to: '/employer/post-job', label: 'Post Job' },
-  { to: '/employer/jobs', label: 'My Jobs' },
+const adminLinks = [
+  { to: '/admin/dashboard', label: 'Dashboard' },
 ];
 
-export default function EmployerLayout() {
-  const { loading, isAuthenticated, isEmployer, profile } = useAuth();
+export default function AdminLayout() {
+  const { loading, isAuthenticated, profile } = useAuth();
+  const isAdmin = profile?.role === ROLES.ADMIN;
 
   if (loading) {
     return (
@@ -22,19 +21,19 @@ export default function EmployerLayout() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
-  if (!isEmployer) {
-    if (profile?.role === ROLES.ADMIN) {
-      return <Navigate to="/admin/dashboard" replace />;
+  if (!isAdmin) {
+    if (profile?.role === ROLES.EMPLOYER) {
+      return <Navigate to="/employer/dashboard" replace />;
     }
     return <Navigate to="/candidate/dashboard" replace />;
   }
 
   return (
     <div className="min-h-screen">
-      <Navbar links={employerLinks} showAuth />
+      <Navbar links={adminLinks} showAuth />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Outlet />
       </main>
