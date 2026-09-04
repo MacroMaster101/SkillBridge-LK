@@ -79,8 +79,8 @@ Together, features **7 (apply to a job)** and **10 (status updates)** are the tw
 | Public pages (landing, jobs, job details, employers, login, register) | ✅ Complete |
 | Backend API, Supabase schema & seed data | ✅ Complete |
 | Skill-match calculation | ✅ Complete |
-| Supabase authentication | 🚧 In progress |
-| Candidate & employer dashboards | 🚧 In progress |
+| Supabase authentication | ✅ Complete  |
+| Candidate & employer dashboards | ✅ Complete  |
 
 > ⚠️ The public pages currently display **sample listings** from `client/src/features/jobs/data/publicJobs.js`. They demonstrate the browsing experience and are not live vacancies.
 
@@ -318,7 +318,7 @@ Set the same environment variables in each host's dashboard — local `.env` fil
 |---|---|---|---|
 | Claude Code | "Redesign all public landing pages" | Public UI design system, landing / jobs / employers / auth pages | Reviewed in browser at desktop and mobile widths; verified `npm run build`, accessibility and responsive behaviour |
 | Claude Code | "Build the candidate onboarding flow and skill-match display" | Candidate onboarding form, job feed match %, application dashboard | Reviewed component-by-component, checked validation messages, tested on mobile width |
-| Cursor | `_TBD_` | `_TBD_` | `_TBD_` |
+| Cursor | "Build the employer job posting form"| Employer-side job posting UI | Tested the form manually, checked required fields and error states, confirmed the posted job appeared in the job list |
 
 > 🔐 Do not include API keys, passwords or personal information in the prompt log.
 
