@@ -1,165 +1,365 @@
-# SkillBridge LK
+# 🌉 SkillBridge LK
 
-> Connecting Sri Lankan students, diploma holders, undergraduates, and early-career job seekers with small-business opportunities that match their skills.
+> **Entry-level should mean entry-level.**
+> Connecting Sri Lankan students, diploma holders, undergraduates and early-career job seekers with small-business opportunities that match their skills.
 
-**Module:** SE3090 – Software Engineering Frameworks  
+<p>
+  <img alt="Module" src="https://img.shields.io/badge/Module-SE3090-14202e?style=flat-square" />
+  <img alt="Assessment" src="https://img.shields.io/badge/Assessment-Mini%20Hackathon-e9a227?style=flat-square" />
+  <img alt="Stack" src="https://img.shields.io/badge/Stack-React%20%2B%20Express%20%2B%20Supabase-0f6357?style=flat-square" />
+</p>
+
+**Module:** SE3090 – Software Engineering Frameworks
 **Assessment:** Assignment 2 — Mini Hackathon
+**Team size:** 4
 
-## Problem
+---
 
-Early-career job seekers in Sri Lanka struggle to find relevant internships, part-time work, and entry-level roles. Small businesses lack simple tools to reach junior candidates and manage applications.
+## 🇱🇰 Problem
 
-## Proposed Solution
+Sri Lankan undergraduates, diploma and HND holders, recent graduates and other early-career job seekers struggle to find internships, part-time work, trainee positions and entry-level roles that are actually relevant to their skills.
 
-SkillBridge LK is a lightweight recruitment platform where candidates complete onboarding with skills and preferences, then browse jobs with skill-match percentages. Employers post vacancies, review applicants, and update application statuses.
+**On the candidate side:**
 
-## Main Features (MVP)
+- 🔍 Hard to find jobs relevant to the skills they already have
+- 📚 Too many unrelated vacancies to sift through
+- 🎓 Beginner-friendly roles are difficult to identify
+- 📋 No simple way to track multiple applications
+- 🪪 Non-degree candidates get fewer targeted opportunities
 
-- Candidate onboarding with skills and preferences
-- Employer job posting and business profile
-- Job listing with search and filters
-- Skill-based match percentage
-- Apply to jobs and track application status
-- Employer applicant management
+**On the employer side:**
 
-## Technologies
+- 🏪 Small businesses need a simple way to publish vacancies
+- 🤝 Employers need to reach suitable junior candidates
+- 🗂️ Applications become hard to organise manually
+- 📨 No easy way to keep candidates updated on progress
+
+On large job platforms, entry-level candidates compete directly with experienced applicants, and small businesses rarely have a dedicated recruitment system.
+
+---
+
+## 💡 Proposed Solution
+
+SkillBridge LK is a lightweight recruitment platform built specifically for the **first step** of a career.
+
+Candidates complete a short onboarding process covering their education level, student status, skills, preferred job categories, job type and work mode. The system then compares their skills against the skills each vacancy requires and shows a **skill-match percentage**, so candidates know where they stand *before* they apply.
+
+Small businesses create an employer profile, post vacancies with required skills, review applicants alongside their match percentage, and move applications through a clear status flow that candidates can follow from their own dashboard.
+
+```text
+Candidate Skills → Relevant Job → Skill Match → Apply
+       → Application Tracking → Employer Review → Status Update
+```
+
+---
+
+## ✨ Main Features
+
+| # | Feature | Description |
+|---|---|---|
+| 1 | 🧑‍🎓 **Candidate onboarding** | Education, user type, skills and job preferences |
+| 2 | 🏢 **Employer profile** | Business name, category, location and contact details |
+| 3 | 📝 **Job posting** | Title, description, category, type, work mode, required skills |
+| 4 | 📃 **Job listing** | Browse all active vacancies |
+| 5 | 🔎 **Search & filters** | By keyword, category, job type, work mode and location |
+| 6 | 🎯 **Skill-match percentage** | `matched job skills ÷ total job skills × 100` |
+| 7 | 🚀 **Apply to a job** | One-click application from the job page |
+| 8 | 📊 **Candidate dashboard** | Track every application and its current status |
+| 9 | 👥 **Employer applicant view** | See applicants sorted by skill match |
+| 10 | 🔄 **Status updates** | Applied → Under Review → Shortlisted → Hired / Rejected |
+
+### 📌 Current build status
+
+| Area | Status |
+|---|---|
+| Public pages (landing, jobs, job details, employers, login, register) | ✅ Complete |
+| Backend API, Supabase schema & seed data | ✅ Complete |
+| Skill-match calculation | ✅ Complete |
+| Supabase authentication | 🚧 In progress |
+| Candidate & employer dashboards | 🚧 In progress |
+
+> ⚠️ The public pages currently display **sample listings** from `client/src/features/jobs/data/publicJobs.js`. They demonstrate the browsing experience and are not live vacancies.
+
+---
+
+## 🛠️ Technologies
 
 | Layer | Stack |
-|-------|-------|
-| Frontend | React, Vite, React Router, Tailwind CSS, Axios, React Hook Form, Zod |
-| Backend | Node.js, Express, Zod |
-| Database & Auth | Supabase (PostgreSQL) |
+|---|---|
+| 🖥️ **Frontend** | React 18, Vite 6, React Router 6, Axios, React Hook Form, Zod |
+| ⚙️ **Backend** | Node.js, Express 4, Zod |
+| 🗄️ **Database & Auth** | Supabase (PostgreSQL + Auth + Row-Level Security) |
+| 🎨 **Styling** | Custom CSS design system (public pages) + Tailwind CSS (app pages) |
+| ☁️ **Deployment** | Vercel (frontend) · Render/Railway (backend) · Supabase (database) |
 
-## Architecture
+---
 
+## 🏗️ Architecture
+
+```text
+┌─────────────────┐   HTTP/JSON   ┌──────────────────┐   supabase-js   ┌──────────────┐
+│  React (Vite)   │ ────────────► │  Node / Express  │ ──────────────► │   Supabase   │
+│  localhost:5173 │ ◄──────────── │  localhost:5000  │ ◄────────────── │  PostgreSQL  │
+└─────────────────┘               └──────────────────┘                 └──────────────┘
+        │                                                                      ▲
+        └──────────────── Supabase Auth (anon key, browser) ───────────────────┘
 ```
-React Frontend  →  HTTP/JSON  →  Node.js/Express API  →  Supabase PostgreSQL
-```
 
-## Project Structure
+🔐 The **service role key lives only on the backend**. The browser only ever receives the public anon key.
 
-```
+### 📁 Project structure
+
+```text
 SkillBridge-LK/
-├── client/          # React frontend (Vite)
-├── server/          # Express API
-├── supabase/        # Database schema & seed SQL
-└── README.md
+├── client/            # React frontend (Vite)
+│   ├── public/
+│   └── src/
+│       ├── components/    # Shared UI + public design system
+│       ├── features/      # auth · jobs · onboarding · applications · employer
+│       ├── layouts/       # Public / Candidate / Employer shells
+│       ├── routes/        # React Router configuration
+│       └── services/      # Axios client + Supabase client
+├── server/            # Express API
+│   └── src/
+│       ├── config/        # env + Supabase admin client
+│       ├── controllers/   # Request handlers
+│       ├── middleware/    # auth · validation · error handling
+│       ├── routes/        # API route definitions
+│       ├── services/      # Database access logic
+│       ├── utils/         # Skill-match calculation
+│       └── validators/    # Zod schemas
+└── supabase/          # schema.sql + seed.sql
 ```
 
-## Setup Instructions
+---
 
-### Prerequisites
+## ⚡ Setup Instructions
 
-- Node.js 18+
-- A [Supabase](https://supabase.com) project
+### ✅ Prerequisites
 
-### 1. Database Setup
+- **Node.js 20 or later** and npm
+- A free [Supabase](https://supabase.com) project
 
-1. Create a Supabase project
-2. Run `supabase/schema.sql` in the SQL Editor
-3. Run `supabase/seed.sql` to seed skills
+### 1️⃣ Clone the repository
 
-### 2. Environment Variables
+```bash
+git clone https://github.com/MacroMaster101/SkillBridge-LK.git
+cd SkillBridge-LK
+```
 
-Copy the example env files and fill in your Supabase credentials:
+### 2️⃣ Set up the database
+
+In your Supabase project's **SQL Editor**:
+
+1. Run `supabase/schema.sql` — creates all 8 tables and row-level security policies
+2. Run `supabase/seed.sql` — seeds the 21 starter skills
+
+Tables created: `profiles`, `candidate_profiles`, `employers`, `skills`, `candidate_skills`, `jobs`, `job_skills`, `applications`.
+
+### 3️⃣ Install dependencies
+
+```bash
+cd client && npm install
+cd ../server && npm install
+```
+
+### 4️⃣ Create the environment files
 
 ```bash
 cp client/.env.example client/.env
 cp server/.env.example server/.env
 ```
 
-**Frontend** (`client/.env`):
+Then fill them in as described below.
+
+---
+
+## 🔑 Environment Variables
+
+### Frontend — `client/.env`
+
 ```env
 VITE_API_URL=http://localhost:5000/api
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-**Backend** (`server/.env`):
+### Backend — `server/.env`
+
 ```env
 PORT=5000
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 CLIENT_URL=http://localhost:5173
 ```
 
-> Never commit real keys. The service role key must only be used on the backend.
+> 🚨 **Never commit real keys.** Both `.env` files are gitignored.
+> The `SUPABASE_SERVICE_ROLE_KEY` bypasses row-level security and must **only** be used on the backend — never in the frontend.
 
-### 3. Install Dependencies
+---
 
-```bash
-# Frontend
-cd client && npm install
-
-# Backend
-cd ../server && npm install
-```
-
-### 4. Running Locally
-
-Open two terminals:
+## 🖥️ Running Frontend
 
 ```bash
-# Terminal 1 — Backend
-cd server && npm run dev
-
-# Terminal 2 — Frontend
-cd client && npm run dev
+cd client
+npm run dev
 ```
 
-- Frontend: http://localhost:5173
-- Backend health check: http://localhost:5000/health
+🌐 Available at **http://localhost:5173**
 
-## Team Workflow
+| Script | What it does |
+|---|---|
+| `npm run dev` | Start the Vite dev server with hot reload |
+| `npm run build` | Build for production into `client/dist` |
+| `npm run preview` | Preview the production build locally |
 
-Each feature area has placeholder pages and `TODO` comments marking where to implement logic:
+---
 
-| Area | Path | Owner task |
-|------|------|------------|
-| Auth | `client/src/features/auth/` | Supabase login/register |
-| Onboarding | `client/src/features/onboarding/` | Candidate profile form |
-| Jobs | `client/src/features/jobs/` | Job listing, filters, details |
-| Applications | `client/src/features/applications/` | Apply & track status |
-| Employer | `client/src/features/employer/` | Dashboard, post job, applicants |
-| API | `server/src/controllers/` | Connect controllers to Supabase |
+## ⚙️ Running Backend
 
-## API Endpoints
+```bash
+cd server
+npm run dev
+```
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/jobs` | List all active jobs |
-| GET | `/api/jobs/:id` | Get job details |
-| POST | `/api/jobs` | Create job (employer) |
-| POST | `/api/jobs/:jobId/apply` | Apply to job (candidate) |
-| GET | `/api/candidates/me` | Get candidate profile |
-| PUT | `/api/candidates/me` | Update candidate profile |
-| GET | `/api/candidates/me/recommendations` | Recommended jobs |
-| GET | `/api/applications/me` | My applications |
-| GET | `/api/jobs/:jobId/applications` | Job applicants (employer) |
-| PATCH | `/api/applications/:id/status` | Update application status |
+🌐 Available at **http://localhost:5000** · health check: **http://localhost:5000/health**
 
-## Deployment
+| Script | What it does |
+|---|---|
+| `npm run dev` | Start the API with `node --watch` (auto-restart) |
+| `npm start` | Start the API without watch mode |
 
-- **Frontend:** Vercel
-- **Backend:** Render or Railway
-- **Database:** Supabase cloud
+Run both in **two separate terminals**.
 
-## Team Members
+### 📡 API reference
 
-<!-- Add team member names and roles here -->
+| Method | Endpoint | Auth | Purpose |
+|---|---|---|---|
+| `GET` | `/health` | — | Service health check |
+| `GET` | `/api/jobs` | — | List active jobs (supports `search`, `category`, `jobType`, `workMode`, `location`) |
+| `GET` | `/api/jobs/:id` | — | Job details |
+| `POST` | `/api/jobs` | 🔒 Employer | Create a vacancy |
+| `POST` | `/api/jobs/:jobId/apply` | 🔒 Candidate | Apply to a job |
+| `GET` | `/api/jobs/:jobId/applications` | 🔒 Employer | Applicants for a job |
+| `GET` | `/api/candidates/me` | 🔒 Candidate | Own profile |
+| `PUT` | `/api/candidates/me` | 🔒 Candidate | Update profile |
+| `PUT` | `/api/candidates/me/skills` | 🔒 Candidate | Update skills |
+| `POST` | `/api/employers` | 🔒 Employer | Create business profile |
+| `GET` | `/api/employers/me` | 🔒 Employer | Own business profile |
+| `GET` | `/api/applications/me` | 🔒 Candidate | Own applications |
+| `PATCH` | `/api/applications/:applicationId/status` | 🔒 Employer | Update application status |
 
-## Contributions
+🔒 Protected routes require an `Authorization: Bearer <supabase_access_token>` header.
 
-<!-- Document each member's contributions -->
+---
 
-## AI Tools Used
+## 🚀 Deployment
 
-<!-- Document any AI tools used during development -->
+| Piece | Host | Notes |
+|---|---|---|
+| 🖥️ Frontend | **Vercel** | Root Directory `client`, framework preset **Vite**, output `dist`. `client/vercel.json` adds the SPA rewrite so deep links like `/jobs/1` resolve. |
+| ⚙️ Backend | **Render / Railway** | Root Directory `server`, start command `npm start`. Set `CLIENT_URL` to the deployed frontend URL so CORS passes. |
+| 🗄️ Database | **Supabase** | Run `schema.sql` then `seed.sql` in the SQL Editor. |
 
-## Deployed Application
+Set the same environment variables in each host's dashboard — local `.env` files are not deployed.
 
-<!-- Add deployed URL here -->
+---
 
-## Demo Video
+## 🧪 Demo Accounts
 
-<!-- Add demo video link here -->
+<!-- TODO: Create these in Supabase Auth before the demo and fill in the credentials. -->
+
+| Role | Email | Password |
+|---|---|---|
+| 🧑‍🎓 Candidate | `_TBD_` | `_TBD_` |
+| 🏢 Employer | `_TBD_` | `_TBD_` |
+
+---
+
+## 👥 Team Members
+
+<!-- TODO: Replace with real names and student IDs before submission. -->
+
+| # | Name | Student ID | Focus area |
+|---|---|---|---|
+| 1 | `_TBD_` | `_TBD_` | Candidate frontend |
+| 2 | `_TBD_` | `_TBD_` | Employer frontend |
+| 3 | `_TBD_` | `_TBD_` | Backend + Supabase |
+| 4 | `_TBD_` | `_TBD_` | Recommendation + integration + deployment |
+
+---
+
+## 🤝 Contributions
+
+<!-- TODO: Fill in per member. Every member must have their own commits in the repo. -->
+
+| Member | Contribution |
+|---|---|
+| `_TBD_` | Candidate onboarding form, candidate dashboard, application tracking UI |
+| `_TBD_` | Employer profile setup, job posting form, applicant management UI |
+| `_TBD_` | Supabase schema and RLS, Express API, authentication middleware |
+| `_TBD_` | Skill-match logic, frontend/backend integration, deployment |
+
+---
+
+## 🤖 AI Tools Used
+
+<!-- TODO: Verify and extend. The assessment requires significant AI usage to be logged. -->
+
+**Declaration:**
+
+> AI assistants were used to support component scaffolding, API structure, debugging and sample data generation. The team reviewed, tested, modified and can explain all submitted code.
+
+### 📝 AI prompt log
+
+| AI Tool | Prompt (summary) | Purpose | How the output was checked / modified |
+|---|---|---|---|
+| Claude Code | "Redesign all public landing pages" | Public UI design system, landing / jobs / employers / auth pages | Reviewed in browser at desktop and mobile widths; verified `npm run build`, accessibility and responsive behaviour |
+| `_TBD_` | `_TBD_` | `_TBD_` | `_TBD_` |
+
+> 🔐 Do not include API keys, passwords or personal information in the prompt log.
+
+---
+
+## 🌐 Deployed Application
+
+<!-- TODO: Add the public URLs once deployed. -->
+
+- 🖥️ **Frontend:** `_TBD_`
+- ⚙️ **API health check:** `_TBD_/health`
+
+> ✅ Test the deployed link in an **incognito window** before submitting.
+
+---
+
+## 🎬 Demo Video
+
+<!-- TODO: Add the two-minute demo video link. -->
+
+📹 **Link:** `_TBD_`
+
+**Suggested two-minute flow:** problem → solution → candidate onboarding → skill match → apply → employer review → status update → impact.
+
+---
+
+## ✅ Requirements Checklist
+
+| Requirement | How SkillBridge LK meets it |
+|---|---|
+| Clear landing page / main UI | ✅ Public landing page with search and skill-match demo |
+| Sri Lankan problem explained in-app | ✅ Problem framing throughout the public pages |
+| At least two functional features | ✅ Job posting/applying **and** skill-based matching |
+| At least one user-input form | ✅ Onboarding, job posting, registration, search |
+| Input validation with friendly errors | ✅ Zod schemas on the API, HTML + form validation on the client |
+| Search / filter / calculate / process | ✅ Job search, filters, and skill-match calculation |
+| Responsive desktop & mobile UI | ✅ Verified at 1440px and 375px |
+| Basic navigation | ✅ Public, candidate and employer route groups |
+| Relevant sample data | ✅ 21 seeded skills + sample Sri Lankan job listings |
+| Clear value to Sri Lankan users | ✅ Improves entry-level employment access |
+
+---
+
+<p align="center">
+  <strong>🌉 SkillBridge LK</strong> — built for the people taking their first step.<br />
+  <sub>ඔබේ ඊළඟ පියවර · உங்கள் அடுத்த படி · Your next step</sub>
+</p>
