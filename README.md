@@ -275,8 +275,8 @@ Set the same environment variables in each host's dashboard — local `.env` fil
 
 | Role | Email | Password |
 |---|---|---|
-| 🧑‍🎓 Candidate |  | `_TBD_` |
-| 🏢 Employer | `_TBD_` | `_TBD_` |
+| 🧑‍🎓 Candidate |  | roshenibolonne@gmail.com | Rosheni@123
+| 🏢 Employer | kavisha@gmail.com | abcd1234 |
 
 ---
 
