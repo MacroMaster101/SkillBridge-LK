@@ -2,6 +2,8 @@ import { Outlet, Navigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../hooks/useAuth';
+import { ROLES } from '../constants';
+
 const candidateLinks = [
   { to: '/candidate/dashboard', label: 'Dashboard' },
   { to: '/jobs', label: 'Jobs' },
@@ -10,7 +12,7 @@ const candidateLinks = [
 ];
 
 export default function CandidateLayout() {
-  const { loading, isAuthenticated, isCandidate } = useAuth();
+  const { loading, isAuthenticated, isCandidate, profile } = useAuth();
 
   if (loading) {
     return (
@@ -25,6 +27,9 @@ export default function CandidateLayout() {
   }
 
   if (!isCandidate) {
+    if (profile?.role === ROLES.ADMIN) {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
     return <Navigate to="/employer/dashboard" replace />;
   }
 
