@@ -26,3 +26,34 @@ Thumbs.db
 
 # Vite
 *.local
+
+# AI coding assistants & agent tooling
+.claude/
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.mcp.json
+.cursor/
+.cursorrules
+.cursorignore
+.aider*
+.windsurf/
+.windsurfrules
+.codeium/
+.continue/
+.cline/
+.clinerules/
+.roo/
+.roomodes
+.kilocode/
+.opencode/
+.goose/
+.gemini/
+.junie/
+.trae/
+.qodo/
+.specstory/
+.serena/
+.zed/
+.github/copilot-instructions.md
+repomix-output.*
