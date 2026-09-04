@@ -1,4 +1,4 @@
-import { applySchema } from "../validators/candidate.js";
+import { applySchema } from "../validators/schemas.js";
 import * as service from "../services/applicationService.js";
 
 export async function applyToJob(req, res) {
