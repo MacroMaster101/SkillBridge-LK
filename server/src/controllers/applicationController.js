@@ -1,29 +1,48 @@
-// TODO: Implement application flow with Supabase
+import * as applicationService from '../services/applicationService.js';
 
-export async function applyToJob(req, res) {
-  res.status(501).json({
-    error: 'Not implemented',
-    message: `POST /api/jobs/${req.params.jobId}/apply — submit application`,
-  });
+export async function applyToJob(req, res, next) {
+  try {
+    res.status(501).json({
+      error: 'Not implemented',
+      message: `POST /api/jobs/${req.params.jobId}/apply — submit application`,
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
-export async function getMyApplications(_req, res) {
-  res.status(501).json({
-    error: 'Not implemented',
-    message: 'GET /api/applications/me — fetch candidate applications',
-  });
+export async function getMyApplications(_req, res, next) {
+  try {
+    res.status(501).json({
+      error: 'Not implemented',
+      message: 'GET /api/applications/me — fetch candidate applications',
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
-export async function getJobApplications(req, res) {
-  res.status(501).json({
-    error: 'Not implemented',
-    message: `GET /api/jobs/${req.params.jobId}/applications — fetch applicants for job`,
-  });
+export async function getJobApplications(req, res, next) {
+  try {
+    const applicants = await applicationService.getJobApplications(
+      req.params.jobId,
+      req.user.id,
+    );
+    res.json(applicants);
+  } catch (err) {
+    next(err);
+  }
 }
 
-export async function updateStatus(req, res) {
-  res.status(501).json({
-    error: 'Not implemented',
-    message: `PATCH /api/applications/${req.params.applicationId}/status — update application status`,
-  });
+export async function updateStatus(req, res, next) {
+  try {
+    const application = await applicationService.updateApplicationStatus(
+      req.params.applicationId,
+      req.user.id,
+      req.body.status,
+    );
+    res.json(application);
+  } catch (err) {
+    next(err);
+  }
 }
