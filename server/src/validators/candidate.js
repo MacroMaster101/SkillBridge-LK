@@ -13,3 +13,7 @@ export const updateProfileSchema = z.object({
   location: z.string().optional(),
   preferred_work_mode: z.enum(["On-site", "Hybrid", "Remote"]).optional(),
 });
+
+export const updateSkillsSchema = z.object({
+  skillIds: z.array(z.number().int()).min(1, "Please select at least one skill."),
+});
