@@ -5,7 +5,7 @@ export async function listSkills() {
     .from('skills')
     .select('id, name')
     .order('name', { ascending: true });
-
+  
   if (error) throw new Error(error.message);
   return data || [];
 }

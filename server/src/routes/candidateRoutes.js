@@ -1,12 +1,10 @@
-import { Router } from 'express';
-import { authenticate, requireRole } from '../middleware/auth.js';
-import * as candidateController from '../controllers/candidateController.js';
+import { Router } from "express";
+import { requireAuth } from "../middleware/auth.js";
+import { getMe, updateMe } from "../controllers/candidateController.js";
+import { updateSkills } from "../controllers/candidateSkillsController.js"; // Feature 2
 
 const router = Router();
-
-router.get('/me', authenticate, requireRole('candidate'), candidateController.getMe);
-router.put('/me', authenticate, requireRole('candidate'), candidateController.updateMe);
-router.put('/me/skills', authenticate, requireRole('candidate'), candidateController.updateSkills);
-router.get('/me/recommendations', authenticate, requireRole('candidate'), candidateController.getRecommendations);
-
+router.get("/me", requireAuth, getMe);
+router.put("/me", requireAuth, updateMe);
+router.put("/me/skills", requireAuth, updateSkills); // Feature 2
 export default router;
