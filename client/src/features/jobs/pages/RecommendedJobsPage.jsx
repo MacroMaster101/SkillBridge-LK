@@ -1,23 +1,13 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../../components/Button';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 import MatchBadge from '../../../components/MatchBadge';
-import { Badge, Card, EmptyState, Icon, PageHeader, SkillChip, InfoNote } from '../../../components/AppUI';
-
-// TODO: Replace with API call — GET /api/candidates/me/recommendations
-const PLACEHOLDER_JOBS = [
-  {
-    id: 1,
-    title: 'Frontend Development Intern',
-    company: 'Pixel Lanka',
-    category: 'Software / IT',
-    jobType: 'Internship',
-    location: 'Colombo',
-    workMode: 'Hybrid',
-    skills: ['React', 'JavaScript', 'CSS', 'Git'],
-    matchedSkills: ['React', 'JavaScript', 'CSS'],
-    matchPercentage: 75,
-  },
-];
+import { Badge, Card, EmptyState, ErrorNote, Icon, PageHeader } from '../../../components/AppUI';
+import { jobService } from '../services/jobService';
+import { candidateService } from '../../onboarding/services/candidateService';
+import { enrichJob } from '../../../lib/jobDisplay';
+import { scoreJobsForCandidate } from '../../../lib/skillMatch';
 
 function RecommendedJobCard({ job }) {
   const matched = job.matchedSkills || [];
@@ -31,8 +21,8 @@ function RecommendedJobCard({ job }) {
             <Link to={`/jobs/${job.id}`} className="hover:text-petrol">{job.title}</Link>
           </h3>
           <p className="mt-1.5 flex items-center gap-1.5 text-sm text-ink-soft">
-            <Icon name="pin" size={14} />{job.location}
-            <span className="opacity-40">·</span>{job.workMode}
+            <Icon name="pin" size={14} />{job.location || '—'}
+            {job.workMode && <><span className="opacity-40">·</span>{job.workMode}</>}
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
@@ -41,30 +31,54 @@ function RecommendedJobCard({ job }) {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {job.skills.map((skill) => (
-          <span
-            key={skill}
-            className={`rounded-[3px] px-2 py-1 font-mono text-[0.6rem] ${
-              matched.includes(skill)
-                ? 'bg-petrol-light text-petrol'
-                : 'border border-dashed border-line-strong text-ink-soft'
-            }`}
-          >
-            {matched.includes(skill) ? '✓ ' : '+ '}{skill}
-          </span>
-        ))}
-      </div>
+      {(job.skills || []).length > 0 && (
+        <>
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {job.skills.map((skill) => (
+              <span
+                key={skill}
+                className={`rounded-[3px] px-2 py-1 font-mono text-[0.6rem] ${
+                  matched.includes(skill)
+                    ? 'bg-petrol-light text-petrol'
+                    : 'border border-dashed border-line-strong text-ink-soft'
+                }`}
+              >
+                {matched.includes(skill) ? '✓ ' : '+ '}{skill}
+              </span>
+            ))}
+          </div>
 
-      <p className="mt-3.5 border-t border-dashed border-line-strong pt-3 font-mono text-[0.56rem] uppercase tracking-[0.07em] text-ink-soft">
-        {matched.length} of {job.skills.length} skills matched · the rest you would learn here
-      </p>
+          <p className="mt-3.5 border-t border-dashed border-line-strong pt-3 font-mono text-[0.56rem] uppercase tracking-[0.07em] text-ink-soft">
+            {matched.length} of {job.skills.length} skills matched
+          </p>
+        </>
+      )}
     </Card>
   );
 }
 
 export default function RecommendedJobsPage() {
-  const jobs = PLACEHOLDER_JOBS;
+  const [jobs, setJobs] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      jobService.getAll(),
+      candidateService.getMe().catch(() => null),
+    ])
+      .then(([jobsRes, profileRes]) => {
+        const candidateSkills = (profileRes?.data?.skills || []).map((s) => s.name);
+        const scored = scoreJobsForCandidate((jobsRes.data || []).map(enrichJob), candidateSkills);
+        setJobs(scored);
+      })
+      .catch(() => setError('Could not load recommendations.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner className="py-16" size="lg" />;
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -75,15 +89,13 @@ export default function RecommendedJobsPage() {
         actions={<Link to="/candidate/onboarding"><Button variant="secondary">Edit my skills</Button></Link>}
       />
 
-      <InfoNote>
-        Sample data — real recommendations arrive once your profile is connected to the API.
-      </InfoNote>
+      {error && <ErrorNote>{error}</ErrorNote>}
 
       {jobs.length === 0 ? (
         <EmptyState
           icon="spark"
           title="Nothing matched yet."
-          message="Add a few skills to your profile and roles will appear here, ranked by overlap."
+          message="Add skills to your profile and active vacancies will appear here, ranked by overlap."
           action={<Link to="/candidate/onboarding"><Button size="sm">Add my skills</Button></Link>}
         />
       ) : (

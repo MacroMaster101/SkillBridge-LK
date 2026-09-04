@@ -1,8 +1,9 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Action, Eyebrow, Icon, MatchBoard, OpportunityCard, Trilingual } from '../../../components/PublicUI';
 import { JOB_CATEGORIES } from '../../../constants';
-import { publicJobs } from '../../jobs/data/publicJobs';
+import { jobService } from '../../jobs/services/jobService';
+import { enrichJob } from '../../../lib/jobDisplay';
 
 const CATEGORIES = [
   { name: 'Software / IT', icon: 'code', note: 'Web, mobile and support roles', color: 'lavender' },
@@ -33,7 +34,14 @@ const STEPS = [
 
 export default function LandingPage() {
   const [search, setSearch] = useState('');
+  const [featuredJobs, setFeaturedJobs] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    jobService.getAll()
+      .then((response) => setFeaturedJobs((response.data || []).map(enrichJob).slice(0, 3)))
+      .catch(() => setFeaturedJobs([]));
+  }, []);
 
   const submitSearch = (event) => {
     event.preventDefault();
@@ -129,15 +137,14 @@ export default function LandingPage() {
         <div className="sb-container sb-section">
           <div className="sb-section-heading">
             <div>
-              <Eyebrow>Sample listings</Eyebrow>
+              <Eyebrow>Latest openings</Eyebrow>
               <h2>The kind of roles you will find here.</h2>
               <p>Small teams and local businesses, hiring for the start of a career rather than the middle of one.</p>
             </div>
             <Action to="/jobs" secondary>Browse all <Icon size={17} /></Action>
           </div>
-          <p className="sb-preview-label">Sample data · Not live vacancies</p>
           <div className="sb-job-grid">
-            {publicJobs.slice(0, 3).map((job) => <OpportunityCard key={job.id} job={job} />)}
+            {featuredJobs.map((job) => <OpportunityCard key={job.id} job={job} />)}
           </div>
         </div>
       </section>

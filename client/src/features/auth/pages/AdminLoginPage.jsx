@@ -4,6 +4,7 @@ import { Eyebrow, Icon } from '../../../components/PublicUI';
 import { signIn, signOut, ensureProfile, getHomeRoute } from '../services/authService';
 import { isSupabaseConfigured } from '../../../services/supabase';
 import { ROLES } from '../../../constants';
+import { authLoginSchema } from '../../../lib/validation';
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
@@ -21,8 +22,14 @@ export default function AdminLoginPage() {
     }
 
     const formData = new FormData(event.target);
-    const email = formData.get('email');
-    const password = formData.get('password');
+    const email = formData.get('email')?.toString().trim();
+    const password = formData.get('password')?.toString();
+
+    const validation = authLoginSchema.safeParse({ email, password });
+    if (!validation.success) {
+      setError(validation.error.errors[0]?.message || 'Please check your details.');
+      return;
+    }
 
     setLoading(true);
 

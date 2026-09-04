@@ -42,6 +42,34 @@ export async function createEmployerProfile(ownerId, body) {
   return toEmployerResponse(data);
 }
 
+export async function updateEmployerProfile(ownerId, body) {
+  const employer = await getEmployerByOwnerId(ownerId);
+
+  if (!employer) {
+    throw new AppError(404, 'Employer profile not found');
+  }
+
+  const { data, error } = await supabase
+    .from('employers')
+    .update({
+      company_name: body.companyName,
+      business_category: body.businessCategory || null,
+      description: body.description || null,
+      location: body.location || null,
+      contact_email: body.contactEmail || null,
+      phone: body.phone || null,
+    })
+    .eq('id', employer.id)
+    .select('*')
+    .single();
+
+  if (error) {
+    throw new AppError(500, error.message);
+  }
+
+  return toEmployerResponse(data);
+}
+
 export async function getEmployerDashboard(ownerId) {
   const employer = await getEmployerByOwnerId(ownerId);
 

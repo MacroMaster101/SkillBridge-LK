@@ -2,21 +2,21 @@ import * as applicationService from '../services/applicationService.js';
 
 export async function applyToJob(req, res, next) {
   try {
-    res.status(501).json({
-      error: 'Not implemented',
-      message: `POST /api/jobs/${req.params.jobId}/apply — submit application`,
-    });
+    const application = await applicationService.applyToJob(
+      req.params.jobId,
+      req.user.id,
+      req.body.message,
+    );
+    res.status(201).json(application);
   } catch (err) {
     next(err);
   }
 }
 
-export async function getMyApplications(_req, res, next) {
+export async function getMyApplications(req, res, next) {
   try {
-    res.status(501).json({
-      error: 'Not implemented',
-      message: 'GET /api/applications/me — fetch candidate applications',
-    });
+    const applications = await applicationService.getMyApplications(req.user.id);
+    res.json(applications);
   } catch (err) {
     next(err);
   }

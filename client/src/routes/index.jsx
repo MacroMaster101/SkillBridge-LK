@@ -1,17 +1,8 @@
-import { Routes, Route, Outlet } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import RequireCandidate from '../components/RequireCandidate';
+import { Routes, Route } from 'react-router-dom';
 import PublicLayout from '../layouts/PublicLayout';
 import CandidateLayout from '../layouts/CandidateLayout';
 import EmployerLayout from '../layouts/EmployerLayout';
 import AdminLayout from '../layouts/AdminLayout';
-
-// Candidate Pages
-import Onboarding from '../pages/Onboarding';
-import JobFeed from '../pages/JobFeed';
-import JobDetails from '../pages/JobDetails';
-import ApplyForm from '../pages/ApplyForm';
-import Dashboard from '../pages/Dashboard';
 
 // Public pages
 import LandingPage from '../features/auth/pages/LandingPage';
@@ -25,6 +16,11 @@ import JobsPage from '../features/jobs/pages/JobsPage';
 import JobDetailsPage from '../features/jobs/pages/JobDetailsPage';
 import RecommendedJobsPage from '../features/jobs/pages/RecommendedJobsPage';
 
+// Candidate pages (AppUI)
+import OnboardingPage from '../features/onboarding/pages/OnboardingPage';
+import CandidateDashboardPage from '../features/onboarding/pages/CandidateDashboardPage';
+import CandidateApplicationsPage from '../features/applications/pages/CandidateApplicationsPage';
+
 // Employer pages
 import EmployerSetupPage from '../features/employer/pages/EmployerSetupPage';
 import EmployerDashboardPage from '../features/employer/pages/EmployerDashboardPage';
@@ -34,16 +30,6 @@ import ApplicantsPage from '../features/employer/pages/ApplicantsPage';
 
 // Admin pages
 import AdminDashboardPage from '../features/admin/pages/AdminDashboardPage';
-
-// Candidate-only layout
-function CandidateSideLayout() {
-  return (
-    <>
-      <Navbar />
-      <Outlet />
-    </>
-  );
-}
 
 export default function AppRoutes() {
   return (
@@ -59,49 +45,12 @@ export default function AppRoutes() {
         <Route path="jobs/:id" element={<JobDetailsPage />} />
       </Route>
 
-      {/* Candidate routes - New UI */}
-      <Route path="/candidate-new" element={<CandidateSideLayout />}>
-        <Route path="onboarding" element={<Onboarding />} />
-        <Route
-          index
-          element={
-            <RequireCandidate>
-              <JobFeed />
-            </RequireCandidate>
-          }
-        />
-        <Route
-          path="jobs/:id"
-          element={
-            <RequireCandidate>
-              <JobDetails />
-            </RequireCandidate>
-          }
-        />
-        <Route
-          path="apply/:id"
-          element={
-            <RequireCandidate>
-              <ApplyForm />
-            </RequireCandidate>
-          }
-        />
-        <Route
-          path="dashboard"
-          element={
-            <RequireCandidate>
-              <Dashboard />
-            </RequireCandidate>
-          }
-        />
-      </Route>
-
-      {/* Candidate routes - Old structure */}
+      {/* Candidate routes */}
       <Route path="candidate" element={<CandidateLayout />}>
-        <Route path="onboarding" element={<Onboarding />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="onboarding" element={<OnboardingPage />} />
+        <Route path="dashboard" element={<CandidateDashboardPage />} />
         <Route path="recommended" element={<RecommendedJobsPage />} />
-        <Route path="applications" element={<Dashboard />} />
+        <Route path="applications" element={<CandidateApplicationsPage />} />
       </Route>
 
       {/* Employer routes */}

@@ -1,22 +1,27 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ApplicationCard from '../components/ApplicationCard';
 import Button from '../../../components/Button';
-import { EmptyState, Icon, PageHeader, InfoNote } from '../../../components/AppUI';
-
-// TODO: Replace with API call — GET /api/applications/me
-const PLACEHOLDER_APPLICATIONS = [
-  {
-    id: 1,
-    jobTitle: 'Frontend Development Intern',
-    company: 'Pixel Lanka',
-    status: 'UNDER_REVIEW',
-    appliedAt: '04 Sep 2026',
-    matchPercentage: 80,
-  },
-];
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import { EmptyState, ErrorNote, Icon, PageHeader } from '../../../components/AppUI';
+import { applicationService } from '../services/applicationService';
+import { formatPostedDate } from '../../../lib/jobDisplay';
 
 export default function CandidateApplicationsPage() {
-  const applications = PLACEHOLDER_APPLICATIONS;
+  const [applications, setApplications] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    applicationService.getMyApplications()
+      .then((res) => setApplications(res.data || []))
+      .catch((err) => setError(err.response?.data?.error || err.response?.data?.message || 'Could not load applications.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner className="py-16" size="lg" />;
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -27,9 +32,7 @@ export default function CandidateApplicationsPage() {
         actions={<Link to="/jobs"><Button variant="secondary">Find more roles <Icon size={15} /></Button></Link>}
       />
 
-      <InfoNote>
-        Sample data — this list will fill in once applications are connected to the API.
-      </InfoNote>
+      {error && <ErrorNote>{error}</ErrorNote>}
 
       {applications.length === 0 ? (
         <EmptyState
@@ -41,7 +44,13 @@ export default function CandidateApplicationsPage() {
       ) : (
         <div className="grid gap-4">
           {applications.map((application) => (
-            <ApplicationCard key={application.id} application={application} />
+            <ApplicationCard
+              key={application.id}
+              application={{
+                ...application,
+                appliedAt: formatPostedDate(application.appliedAt),
+              }}
+            />
           ))}
         </div>
       )}

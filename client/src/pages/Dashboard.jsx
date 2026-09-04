@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getCandidate } from '../lib/candidateStorage';
 import { supabase } from '../lib/supabaseClient';
+import { jobService } from '../features/jobs/services/jobService';
 import StatusBadge from '../components/StatusBadge';
 import Button from '../components/Button';
-import { mockJobs } from '../data/mockJobs';
 
 export default function Dashboard() {
   const candidate = getCandidate();
   const [applications, setApplications] = useState([]);
+  const [jobsById, setJobsById] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function Dashboard() {
           setApplications(data || []);
         } else {
           const stored = JSON.parse(localStorage.getItem('applications') || '[]');
-          const filtered = stored.filter(app => app.candidate_name === candidate.name);
+          const filtered = stored.filter((app) => app.candidate_name === candidate.name);
           setApplications(filtered);
         }
       } catch (error) {
@@ -39,20 +40,25 @@ export default function Dashboard() {
     }
   }, [candidate]);
 
-  const getJobTitle = (jobId) => {
-    const job = mockJobs.find(j => j.id === jobId);
-    return job?.title || 'Unknown Job';
-  };
+  useEffect(() => {
+    jobService.getAll()
+      .then((response) => {
+        const map = {};
+        response.data.forEach((job) => {
+          map[job.id] = job;
+        });
+        setJobsById(map);
+      })
+      .catch(() => {});
+  }, []);
 
-  const getJobCompany = (jobId) => {
-    const job = mockJobs.find(j => j.id === jobId);
-    return job?.company || 'Unknown Company';
-  };
+  const getJobTitle = (jobId) => jobsById[jobId]?.title || 'Unknown Job';
+  const getJobCompany = (jobId) => jobsById[jobId]?.company || 'Unknown Company';
 
   const stats = [
     { label: 'Total Applications', value: applications.length },
-    { label: 'Under Review', value: applications.filter(a => a.status === 'Under Review').length },
-    { label: 'Shortlisted', value: applications.filter(a => a.status === 'Shortlisted').length },
+    { label: 'Under Review', value: applications.filter((a) => a.status === 'Under Review').length },
+    { label: 'Shortlisted', value: applications.filter((a) => a.status === 'Shortlisted').length },
   ];
 
   if (loading) {
@@ -99,7 +105,7 @@ export default function Dashboard() {
             <div
               key={app.id}
               className="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => window.location.href = `/candidate-new/jobs/${app.job_id}`}
+              onClick={() => { window.location.href = `/candidate-new/jobs/${app.job_id}`; }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div>

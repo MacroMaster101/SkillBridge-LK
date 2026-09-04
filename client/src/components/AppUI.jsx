@@ -170,17 +170,41 @@ export function TextareaField({ label, hint, error, id, name, rows = 4, classNam
   const inputId = id || name;
   return (
     <Field label={label} hint={hint} error={error} htmlFor={inputId}>
-      <textarea id={inputId} name={name} rows={rows} className={`${CONTROL} ${className}`} {...props} />
+      <textarea
+        id={inputId}
+        name={name}
+        rows={rows}
+        className={`${CONTROL} ${error ? 'border-madder' : ''} ${className}`}
+        {...props}
+      />
     </Field>
   );
 }
 
-export function SelectField({ label, hint, error, id, name, options = [], className = '', ...props }) {
+export function SelectField({
+  label,
+  hint,
+  error,
+  id,
+  name,
+  options = [],
+  placeholder,
+  className = '',
+  ...props
+}) {
   const inputId = id || name;
   return (
     <Field label={label} hint={hint} error={error} htmlFor={inputId}>
-      <select id={inputId} name={name} className={`${CONTROL} cursor-pointer ${className}`} {...props}>
-        {options.map((option) => <option key={option} value={option}>{option}</option>)}
+      <select
+        id={inputId}
+        name={name}
+        className={`${CONTROL} cursor-pointer ${error ? 'border-madder' : ''} ${className}`}
+        {...props}
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map((option) => (
+          <option key={option} value={option}>{option}</option>
+        ))}
       </select>
     </Field>
   );

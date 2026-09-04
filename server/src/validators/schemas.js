@@ -12,17 +12,23 @@ export const onboardingSchema = z.object({
 });
 
 export const employerSchema = z.object({
-  companyName: z.string({ required_error: 'Business name is required' }).min(1, 'Business name is required'),
+  companyName: z.string({ required_error: 'Business name is required' }).trim().min(1, 'Business name is required').max(120, 'Business name is too long'),
   businessCategory: z.string().optional(),
-  description: z.string().optional(),
-  location: z.string().optional(),
-  contactEmail: z.union([z.string().email('Please enter a valid email'), z.literal('')]).optional(),
-  phone: z.string().optional(),
+  description: z.string().trim().max(2000, 'Description is too long').optional(),
+  location: z.string().trim().max(120, 'Location is too long').optional(),
+  contactEmail: z.union([z.string().trim().email('Please enter a valid email'), z.literal('')]).optional(),
+  phone: z
+    .string()
+    .trim()
+    .optional()
+    .refine((value) => !value || /^[\d\s+\-()]{7,20}$/.test(value), {
+      message: 'Please enter a valid phone number',
+    }),
 });
 
 export const jobSchema = z.object({
-  title: z.string().min(1, 'Job title is required'),
-  description: z.string().min(1, 'Description is required'),
+  title: z.string().trim().min(1, 'Job title is required').max(120, 'Job title is too long'),
+  description: z.string().trim().min(20, 'Description must be at least 20 characters').max(5000, 'Description is too long'),
   category: z.string().min(1, 'Category is required'),
   jobType: z.string().min(1, 'Job type is required'),
   location: z.string().optional(),

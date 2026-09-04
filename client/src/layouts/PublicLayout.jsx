@@ -95,7 +95,6 @@ export default function PublicLayout() {
                 Built for SE3090 Software Engineering Frameworks
                 as a mini-hackathon project.
               </p>
-              <p>Listings shown on the public pages are samples, not live vacancies.</p>
             </div>
           </div>
           <div className="sb-footer-bottom">

@@ -1,32 +1,40 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCandidate } from '../lib/candidateStorage';
 import { calculateSkillMatch } from '../utils/matchSkills';
-import { mockJobs } from '../data/mockJobs';
+import { jobService } from '../features/jobs/services/jobService';
 import MatchBadge from '../components/MatchBadge';
 
 export default function JobFeed() {
   const navigate = useNavigate();
   const candidate = getCandidate();
-  const [jobs] = useState(mockJobs);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedJobType, setSelectedJobType] = useState('');
   const [selectedWorkMode, setSelectedWorkMode] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
 
-  const categories = [...new Set(jobs.map(j => j.category))];
-  const jobTypes = [...new Set(jobs.map(j => j.job_type))];
-  const workModes = [...new Set(jobs.map(j => j.work_mode))];
+  useEffect(() => {
+    jobService.getAll()
+      .then((response) => setJobs(response.data))
+      .catch(() => setJobs([]))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const filteredJobs = jobs.filter(job => {
+  const categories = [...new Set(jobs.map((j) => j.category))];
+  const jobTypes = [...new Set(jobs.map((j) => j.jobType))];
+  const workModes = [...new Set(jobs.map((j) => j.workMode))];
+
+  const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.company.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesCategory = !selectedCategory || job.category === selectedCategory;
-    const matchesJobType = !selectedJobType || job.job_type === selectedJobType;
-    const matchesWorkMode = !selectedWorkMode || job.work_mode === selectedWorkMode;
+    const matchesJobType = !selectedJobType || job.jobType === selectedJobType;
+    const matchesWorkMode = !selectedWorkMode || job.workMode === selectedWorkMode;
     const matchesLocation = !selectedLocation || job.location.toLowerCase().includes(selectedLocation.toLowerCase());
 
     return matchesSearch && matchesCategory && matchesJobType && matchesWorkMode && matchesLocation;
@@ -34,8 +42,7 @@ export default function JobFeed() {
 
   const getMatchPercent = (job) => {
     if (!candidate || !candidate.skills) return 0;
-    const jobSkills = job.required_skills.split(',');
-    return calculateSkillMatch(candidate.skills, jobSkills);
+    return calculateSkillMatch(candidate.skills, job.skills || []);
   };
 
   const stats = [
@@ -43,6 +50,14 @@ export default function JobFeed() {
     { label: 'Your Skills', value: candidate?.skills?.length || 0 },
     { label: 'Preferred Categories', value: candidate?.preferredCategories?.length || 0 },
   ];
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-600">Loading jobs...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -80,7 +95,7 @@ export default function JobFeed() {
               className="block w-full rounded-lg border border-paper-2 px-3 py-2 text-sm bg-white text-ink focus:outline-none focus:ring-2 focus:ring-petrol"
             >
               <option value="">All Categories</option>
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
@@ -91,7 +106,7 @@ export default function JobFeed() {
               className="block w-full rounded-lg border border-paper-2 px-3 py-2 text-sm bg-white text-ink focus:outline-none focus:ring-2 focus:ring-petrol"
             >
               <option value="">All Job Types</option>
-              {jobTypes.map(type => (
+              {jobTypes.map((type) => (
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>
@@ -104,7 +119,7 @@ export default function JobFeed() {
               className="block w-full rounded-lg border border-paper-2 px-3 py-2 text-sm bg-white text-ink focus:outline-none focus:ring-2 focus:ring-petrol"
             >
               <option value="">All Work Modes</option>
-              {workModes.map(mode => (
+              {workModes.map((mode) => (
                 <option key={mode} value={mode}>{mode}</option>
               ))}
             </select>
@@ -126,7 +141,7 @@ export default function JobFeed() {
             <p className="text-gray-500">No jobs found matching your criteria.</p>
           </div>
         ) : (
-          filteredJobs.map(job => (
+          filteredJobs.map((job) => (
             <div
               key={job.id}
               className="rounded-xl border border-paper-2 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow p-6"
@@ -144,15 +159,17 @@ export default function JobFeed() {
                   {job.category}
                 </span>
                 <span className="inline-block text-xs font-medium bg-petrol-soft text-petrol-ink px-2 py-1 rounded">
-                  {job.job_type}
+                  {job.jobType}
                 </span>
                 <span className="inline-block text-xs font-medium bg-petrol-soft text-petrol-ink px-2 py-1 rounded">
-                  {job.work_mode}
+                  {job.workMode}
                 </span>
               </div>
-              <p className="mt-3 text-sm text-ink-soft">
-                Posted: {new Date(job.posted_date).toLocaleDateString()}
-              </p>
+              {job.postedDate && (
+                <p className="mt-3 text-sm text-ink-soft">
+                  Posted: {new Date(job.postedDate).toLocaleDateString()}
+                </p>
+              )}
             </div>
           ))
         )}

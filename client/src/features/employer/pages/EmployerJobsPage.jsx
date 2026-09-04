@@ -1,9 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../../components/Button';
-import { Badge, Card, EmptyState, Icon, PageHeader, InfoNote } from '../../../components/AppUI';
-
-// TODO: Replace with API call — employer's own jobs
-const PLACEHOLDER_JOBS = [];
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import { Badge, Card, EmptyState, ErrorNote, Icon, PageHeader } from '../../../components/AppUI';
+import { employerService } from '../services/employerService';
 
 function JobRow({ job }) {
   return (
@@ -13,13 +13,8 @@ function JobRow({ job }) {
           <h3 className="font-display text-lg font-bold tracking-[-0.02em] text-ink">{job.title}</h3>
           <Badge tone={job.status === 'ACTIVE' ? 'petrol' : 'quiet'}>{job.status || 'Active'}</Badge>
         </div>
-        <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-sm text-ink-soft">
-          <Icon name="pin" size={14} />{job.location}
-          <span className="opacity-40">·</span>{job.jobType}
-          <span className="opacity-40">·</span>
-          <span className="font-mono text-[0.6rem] uppercase tracking-[0.07em]">
-            {job.applicantCount ?? 0} {job.applicantCount === 1 ? 'applicant' : 'applicants'}
-          </span>
+        <p className="mt-1.5 font-mono text-[0.6rem] uppercase tracking-[0.07em] text-ink-soft">
+          {job.applicantCount ?? 0} {job.applicantCount === 1 ? 'applicant' : 'applicants'}
         </p>
       </div>
       <Link to={`/employer/jobs/${job.id}/applicants`}>
@@ -30,7 +25,26 @@ function JobRow({ job }) {
 }
 
 export default function EmployerJobsPage() {
-  const jobs = PLACEHOLDER_JOBS;
+  const [jobs, setJobs] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    employerService.getMe()
+      .then((res) => setJobs(res.data?.jobs || []))
+      .catch((err) => {
+        if (err.response?.status === 404) {
+          setJobs([]);
+          return;
+        }
+        setError(err.response?.data?.error || 'Could not load your vacancies.');
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner className="py-16" size="lg" />;
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -41,9 +55,7 @@ export default function EmployerJobsPage() {
         actions={<Link to="/employer/post-job"><Button>Post a vacancy <Icon size={15} /></Button></Link>}
       />
 
-      <InfoNote>
-        Sample view — your real vacancies appear here once posting is connected to the API.
-      </InfoNote>
+      {error && <ErrorNote>{error}</ErrorNote>}
 
       {jobs.length === 0 ? (
         <EmptyState
