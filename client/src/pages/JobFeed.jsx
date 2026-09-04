@@ -55,14 +55,14 @@ export default function JobFeed() {
 
       <div className="mt-8 grid gap-6 sm:grid-cols-3 mb-8">
         {stats.map((stat) => (
-          <div key={stat.label} className="rounded-xl border bg-paper shadow-sm p-6">
+          <div key={stat.label} className="rounded-xl border border-paper-2 bg-white shadow-sm p-6">
             <p className="text-sm text-ink-soft">{stat.label}</p>
             <p className="mt-1 text-3xl font-bold text-petrol">{stat.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl border bg-paper shadow-sm p-6 mb-8">
+      <div className="rounded-xl border border-paper-2 bg-paper-light shadow-sm p-6 mb-8">
         <h2 className="text-lg font-semibold font-display text-ink mb-4">Search & Filter</h2>
         <div className="space-y-4">
           <input
@@ -129,7 +129,7 @@ export default function JobFeed() {
           filteredJobs.map(job => (
             <div
               key={job.id}
-              className="rounded-xl border bg-paper shadow-sm cursor-pointer hover:shadow-md transition-shadow p-6"
+              className="rounded-xl border border-paper-2 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow p-6"
               onClick={() => navigate(`/candidate-new/jobs/${job.id}`)}
             >
               <div className="flex items-start justify-between gap-4">
