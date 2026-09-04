@@ -5,7 +5,7 @@
 CREATE TABLE profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     full_name TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('candidate', 'employer')),
+    role TEXT NOT NULL CHECK (role IN ('candidate', 'employer', 'admin')),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -82,14 +82,25 @@ CREATE TABLE applications (
 -- Auto-create profile on signup (run after enabling auth)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  user_role TEXT;
 BEGIN
-    INSERT INTO public.profiles (id, full_name, role)
-    VALUES (
-        NEW.id,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', 'User'),
-        COALESCE(NEW.raw_user_meta_data->>'role', 'candidate')
-    );
-    RETURN NEW;
+  user_role := COALESCE(NEW.raw_user_meta_data->>'role', 'candidate');
+
+  INSERT INTO public.profiles (id, full_name, role)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', 'User'),
+    user_role
+  );
+
+  -- Create role-specific profile row
+  IF user_role = 'candidate' THEN
+    INSERT INTO public.candidate_profiles (user_id, user_type, onboarding_completed)
+    VALUES (NEW.id, 'Pending onboarding', FALSE);
+  END IF;
+
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

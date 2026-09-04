@@ -924,6 +924,11 @@ button.sb-cell:hover { border-color: rgba(237, 239, 232, 0.4); color: var(--pape
   font-size: 0.85rem; color: var(--petrol-ink);
 }
 .sb-form-feedback a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.sb-form-error {
+  background: #fef2f2;
+  border-left-color: #dc2626;
+  color: #991b1b;
+}
 
 .sb-auth-submit { justify-content: center; width: 100%; }
 .sb-preview-form-note {
