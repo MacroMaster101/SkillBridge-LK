@@ -7,6 +7,7 @@ import EmployerLayout from '../layouts/EmployerLayout';
 import LandingPage from '../features/auth/pages/LandingPage';
 import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
+import EmployersPage from '../features/auth/pages/EmployersPage';
 
 // Candidate pages
 import OnboardingPage from '../features/onboarding/pages/OnboardingPage';
@@ -33,6 +34,7 @@ export default function AppRoutes() {
         <Route index element={<LandingPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="employers" element={<EmployersPage />} />
         <Route path="jobs" element={<JobsPage />} />
         <Route path="jobs/:id" element={<JobDetailsPage />} />
       </Route>
