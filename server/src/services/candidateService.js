@@ -30,6 +30,7 @@ export async function upsertCandidateProfile(userId, input) {
     field_of_study: input.field_of_study,
     location: input.location,
     preferred_work_mode: input.preferred_work_mode,
+    preferred_job_types: input.preferred_job_types || [],
     onboarding_completed: true,
   });
   if (error) throw new Error(error.message);

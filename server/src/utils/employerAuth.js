@@ -36,7 +36,7 @@ export async function assertJobOwnership(jobId, ownerId) {
     throw new AppError(404, 'Job not found');
   }
 
-  if (job.employer_id !== employer.id) {
+  if (Number(job.employer_id) !== Number(employer.id)) {
     throw new AppError(403, 'You do not have access to this resource');
   }
 

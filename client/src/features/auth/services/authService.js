@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../../../services/supabase';
+import { supabase, isSupabaseConfigured, syncAuthSession } from '../../../services/supabase';
 import { ROLES } from '../../../constants';
 
 export function getHomeRoute(role) {
@@ -9,7 +9,7 @@ export function getHomeRoute(role) {
       return '/employer/dashboard';
     case ROLES.CANDIDATE:
     default:
-      return '/candidate-new/';
+      return '/candidate/dashboard';
   }
 }
 
@@ -19,7 +19,7 @@ export function getPostRegisterRoute(role) {
       return '/employer/setup';
     case ROLES.CANDIDATE:
     default:
-      return '/candidate-new/onboarding';
+      return '/candidate/onboarding';
   }
 }
 
@@ -44,6 +44,7 @@ export async function signUp({ email, password, fullName, role }) {
   });
 
   if (error) throw error;
+  syncAuthSession(data.session);
   return data;
 }
 
@@ -58,6 +59,7 @@ export async function signIn({ email, password }) {
   });
 
   if (error) throw error;
+  syncAuthSession(data.session);
   return data;
 }
 

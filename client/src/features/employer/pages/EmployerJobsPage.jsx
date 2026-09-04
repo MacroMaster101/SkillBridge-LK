@@ -1,46 +1,74 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../../components/Button';
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import { Badge, Card, EmptyState, ErrorNote, Icon, PageHeader } from '../../../components/AppUI';
+import { employerService } from '../services/employerService';
 
-// TODO: Replace with API call — GET employer jobs
-const PLACEHOLDER_JOBS = [];
+function JobRow({ job }) {
+  return (
+    <Card className="flex flex-wrap items-center justify-between gap-4 p-5">
+      <div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h3 className="font-display text-lg font-bold tracking-[-0.02em] text-ink">{job.title}</h3>
+          <Badge tone={job.status === 'ACTIVE' ? 'petrol' : 'quiet'}>{job.status || 'Active'}</Badge>
+        </div>
+        <p className="mt-1.5 font-mono text-[0.6rem] uppercase tracking-[0.07em] text-ink-soft">
+          {job.applicantCount ?? 0} {job.applicantCount === 1 ? 'applicant' : 'applicants'}
+        </p>
+      </div>
+      <Link to={`/employer/jobs/${job.id}/applicants`}>
+        <Button variant="secondary" size="sm">Review applicants <Icon size={14} /></Button>
+      </Link>
+    </Card>
+  );
+}
 
 export default function EmployerJobsPage() {
-  return (
-    <div>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Jobs</h1>
-          <p className="mt-2 text-gray-600">Manage your active job listings.</p>
-        </div>
-        <Link to="/employer/post-job">
-          <Button>Post New Job</Button>
-        </Link>
-      </div>
+  const [jobs, setJobs] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
-      <div className="mt-8 grid gap-4">
-        {PLACEHOLDER_JOBS.length === 0 ? (
-          <div className="rounded-xl border bg-white p-8 text-center shadow-sm">
-            <p className="text-gray-500">No jobs posted yet.</p>
-            <Link to="/employer/post-job" className="mt-4 inline-block">
-              <Button>Create your first job</Button>
-            </Link>
-          </div>
-        ) : (
-          PLACEHOLDER_JOBS.map((job) => (
-            <div key={job.id} className="rounded-xl border bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">{job.title}</h3>
-                  <p className="text-sm text-gray-500">{job.applicantCount} applicants</p>
-                </div>
-                <Link to={`/employer/jobs/${job.id}/applicants`}>
-                  <Button size="sm" variant="secondary">View Applicants</Button>
-                </Link>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+  useEffect(() => {
+    employerService.getMe()
+      .then((res) => setJobs(res.data?.jobs || []))
+      .catch((err) => {
+        if (err.response?.status === 404) {
+          setJobs([]);
+          return;
+        }
+        setError(err.response?.data?.error || 'Could not load your vacancies.');
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner className="py-16" size="lg" />;
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      <PageHeader
+        eyebrow="Your vacancies"
+        title="Everything you have posted."
+        lead="Open a vacancy to review its applicants and move them through your process."
+        actions={<Link to="/employer/post-job"><Button>Post a vacancy <Icon size={15} /></Button></Link>}
+      />
+
+      {error && <ErrorNote>{error}</ErrorNote>}
+
+      {jobs.length === 0 ? (
+        <EmptyState
+          icon="briefcase"
+          title="No vacancies yet."
+          message="Post a role with the skills it needs, and candidates will be matched against it automatically."
+          action={<Link to="/employer/post-job"><Button size="sm">Post your first vacancy</Button></Link>}
+        />
+      ) : (
+        <div className="grid gap-4">
+          {jobs.map((job) => <JobRow key={job.id} job={job} />)}
+        </div>
+      )}
     </div>
   );
 }

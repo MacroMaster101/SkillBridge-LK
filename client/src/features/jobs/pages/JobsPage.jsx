@@ -1,7 +1,9 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Action, Eyebrow, Icon, OpportunityCard } from '../../../components/PublicUI';
 import { JOB_CATEGORIES, JOB_TYPES, WORK_MODES } from '../../../constants';
-import { publicJobs } from '../data/publicJobs';
+import { jobService } from '../services/jobService';
+import { enrichJob } from '../../../lib/jobDisplay';
 
 const FILTERS = [
   { key: 'category', label: 'Job category', options: JOB_CATEGORIES },
@@ -10,10 +12,13 @@ const FILTERS = [
 ];
 
 const FILTER_KEYS = ['category', 'jobType', 'workMode', 'location'];
-const LOCATIONS = [...new Set(publicJobs.map((job) => job.location))].sort();
 
 export default function JobsPage() {
   const [params, setParams] = useSearchParams();
+  const [jobs, setJobs] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const update = (key, value) => setParams((previous) => {
     const next = new URLSearchParams(previous);
@@ -22,18 +27,48 @@ export default function JobsPage() {
     return next;
   }, { replace: true });
 
-  const query = (params.get('search') || '').trim().toLowerCase();
+  useEffect(() => {
+    let cancelled = false;
 
-  const jobs = publicJobs
-    .filter((job) => {
-      const haystack = [job.title, job.company, job.category, ...job.skills].join(' ').toLowerCase();
-      const matchesQuery = !query || haystack.includes(query);
-      const matchesFilters = FILTER_KEYS.every((key) => !params.get(key) || job[key] === params.get(key));
-      return matchesQuery && matchesFilters;
+    jobService.getAll({
+      search: params.get('search') || undefined,
+      category: params.get('category') || undefined,
+      jobType: params.get('jobType') || undefined,
+      workMode: params.get('workMode') || undefined,
+      location: params.get('location') || undefined,
     })
-    .sort((a, b) => (params.get('sort') === 'title' ? a.title.localeCompare(b.title) : a.id - b.id));
+      .then((response) => {
+        if (cancelled) return;
+        let items = (response.data || []).map(enrichJob);
+        if (params.get('sort') === 'title') {
+          items = [...items].sort((a, b) => a.title.localeCompare(b.title));
+        }
+        setJobs(items);
+        setError('');
+      })
+      .catch(() => {
+        if (!cancelled) setError('Could not load opportunities. Please try again.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-  const activeFilters = FILTER_KEYS.filter((key) => params.get(key));
+    return () => { cancelled = true; };
+  }, [params]);
+
+  useEffect(() => {
+    jobService.getAll()
+      .then((response) => {
+        const cities = [...new Set(response.data.map((job) => job.location).filter(Boolean))].sort();
+        setLocations(cities);
+      })
+      .catch(() => {});
+  }, []);
+
+  const activeFilters = useMemo(
+    () => FILTER_KEYS.filter((key) => params.get(key)),
+    [params],
+  );
 
   return (
     <>
@@ -62,7 +97,7 @@ export default function JobsPage() {
               onChange={(event) => update('location', event.target.value)}
             >
               <option value="">All of Sri Lanka</option>
-              {LOCATIONS.map((city) => <option key={city}>{city}</option>)}
+              {locations.map((city) => <option key={city}>{city}</option>)}
             </select>
           </div>
         </div>
@@ -102,7 +137,7 @@ export default function JobsPage() {
         <section className="sb-results" aria-label="Job results">
           <div className="sb-results-heading">
             <h2 aria-live="polite">
-              {jobs.length} {jobs.length === 1 ? 'opportunity' : 'opportunities'}
+              {loading ? 'Loading…' : `${jobs.length} ${jobs.length === 1 ? 'opportunity' : 'opportunities'}`}
             </h2>
             <label>
               Sort by
@@ -113,10 +148,12 @@ export default function JobsPage() {
             </label>
           </div>
 
-          <p className="sb-sample-notice">
-            <Icon name="spark" size={16} />
-            These are sample listings that show how browsing works. They are not live vacancies.
-          </p>
+          {error && (
+            <p className="sb-sample-notice">
+              <Icon name="spark" size={16} />
+              {error}
+            </p>
+          )}
 
           {activeFilters.length > 0 && (
             <div className="sb-active-filters">
@@ -130,7 +167,11 @@ export default function JobsPage() {
             </div>
           )}
 
-          {jobs.length > 0 ? (
+          {loading ? (
+            <div className="sb-empty">
+              <p>Loading opportunities…</p>
+            </div>
+          ) : jobs.length > 0 ? (
             <div className="sb-job-grid">
               {jobs.map((job) => <OpportunityCard job={job} key={job.id} />)}
             </div>

@@ -9,6 +9,8 @@ import {
   getPostRegisterRoute,
 } from '../services/authService';
 import { isSupabaseConfigured } from '../../../services/supabase';
+import { authLoginSchema, authRegisterSchema } from '../../../lib/validation';
+import { isPasswordValid, PasswordValidation } from '../components/PasswordValidation';
 
 const ROLES = [
   { value: 'candidate', label: 'Find work', icon: 'people' },
@@ -20,6 +22,7 @@ export default function AuthPage({ register = false }) {
   const [params, setParams] = useSearchParams();
   const role = params.get('role') === 'employer' ? 'employer' : 'candidate';
   const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState('');
   const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,9 +40,18 @@ export default function AuthPage({ register = false }) {
     }
 
     const formData = new FormData(event.target);
-    const email = formData.get('email');
-    const password = formData.get('password');
-    const fullName = formData.get('fullName');
+    const email = formData.get('email')?.toString().trim();
+    const password = formData.get('password')?.toString();
+    const fullName = formData.get('fullName')?.toString().trim();
+
+    const validation = register
+      ? authRegisterSchema.safeParse({ fullName, email, password })
+      : authLoginSchema.safeParse({ email, password });
+
+    if (!validation.success) {
+      setError(validation.error.errors[0]?.message || 'Please check your details.');
+      return;
+    }
 
     setLoading(true);
 
@@ -167,6 +179,11 @@ export default function AuthPage({ register = false }) {
                 placeholder={register ? 'Create a password' : 'Enter your password'}
                 required
                 minLength={register ? 8 : undefined}
+                value={password}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  if (error) setError('');
+                }}
               />
               <button
                 type="button"
@@ -177,9 +194,8 @@ export default function AuthPage({ register = false }) {
                 <Icon name="eye" size={18} />
               </button>
             </span>
+            <PasswordValidation password={password} register={register} />
           </label>
-
-          {register && <p className="sb-field-hint">Use at least 8 characters.</p>}
 
           {error && (
             <p className="sb-form-feedback sb-form-error" role="alert">
@@ -193,7 +209,11 @@ export default function AuthPage({ register = false }) {
             </p>
           )}
 
-          <button className="sb-button sb-auth-submit" type="submit" disabled={loading}>
+          <button
+            className="sb-button sb-auth-submit"
+            type="submit"
+            disabled={loading || (password.length > 0 && !isPasswordValid(password, register))}
+          >
             {loading ? 'Please wait…' : register ? 'Create account' : 'Log in'}
             {!loading && <Icon size={18} />}
           </button>

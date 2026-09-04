@@ -1,6 +1,7 @@
-import { supabase } from '../config/supabase.js';
-import { AppError } from '../utils/errors.js';
-import { getEmployerByOwnerId } from '../utils/employerAuth.js';
+import { supabase } from "../config/supabase.js";
+import { AppError } from "../utils/errors.js";
+import { getEmployerByOwnerId } from "../utils/employerAuth.js";
+
 
 const JOB_SELECT = `
   id,

@@ -1,38 +1,17 @@
--- SkillBridge LK — Seed Data
--- Run after schema.sql
+-- Seed sample employers and jobs (migrated from client demo data)
+-- Run after schema.sql and seed.sql
+-- Demo employer password (all accounts): SkillBridge123!
 
-INSERT INTO skills (name) VALUES
-    ('React'),
-    ('JavaScript'),
-    ('TypeScript'),
-    ('HTML'),
-    ('CSS'),
-    ('Node.js'),
-    ('Express'),
-    ('Git'),
-    ('SQL'),
-    ('PostgreSQL'),
-    ('Supabase'),
-    ('Figma'),
-    ('Canva'),
-    ('Microsoft Excel'),
-    ('Communication'),
-    ('Customer Service'),
-    ('Social Media Marketing'),
-    ('Content Writing'),
-    ('Accounting'),
-    ('Data Entry'),
-    ('Sales'),
-    ('Attention to Detail')
-ON CONFLICT (name) DO NOTHING;
-
--- Sample employers and jobs (demo employer password: SkillBridge123!)
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 DO $$
 DECLARE
   instance uuid := '00000000-0000-0000-0000-000000000000';
 BEGIN
+  IF EXISTS (SELECT 1 FROM jobs LIMIT 1) THEN
+    RETURN;
+  END IF;
+
   INSERT INTO auth.users (
     instance_id, id, aud, role, email, encrypted_password,
     email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at

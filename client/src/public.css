@@ -800,6 +800,23 @@ button.sb-cell:hover { border-color: rgba(237, 239, 232, 0.4); color: var(--pape
 }
 .sb-detail-summary dd { margin: 0; font-size: 0.88rem; font-weight: 500; text-align: right; }
 
+.sb-detail-skill-group { width: 100%; }
+.sb-detail-skill-label {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-mono); font-size: 0.56rem; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+.sb-tags-muted span {
+  border: 1px dashed var(--line-strong);
+  background: transparent;
+  color: var(--ink-soft);
+}
+.sb-detail-apply-error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--madder);
+}
+
 .sb-detail-note { display: flex; gap: 0.7rem; padding: 1.1rem; border-radius: var(--radius-lg); background: var(--petrol-soft); }
 .sb-detail-note svg { flex: none; color: var(--petrol); }
 .sb-detail-note p { font-size: 0.82rem; color: var(--petrol-ink); }
@@ -917,6 +934,24 @@ button.sb-cell:hover { border-color: rgba(237, 239, 232, 0.4); color: var(--pape
 .sb-password button:hover { color: var(--ink); }
 
 .sb-field-hint { margin-top: -0.3rem; font-size: 0.78rem; color: var(--ink-soft); }
+
+.sb-password-rules {
+  list-style: none;
+  margin: -0.3rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+}
+.sb-password-rules li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink-soft);
+}
+.sb-password-rules li.met { color: #166534; }
+.sb-password-rules li.unmet { color: #b91c1c; }
 
 .sb-form-feedback {
   padding: 0.85rem 1rem; border-radius: var(--radius);

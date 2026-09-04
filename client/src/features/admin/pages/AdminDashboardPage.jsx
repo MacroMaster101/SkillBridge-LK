@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import { Card, ErrorNote, Icon, PageHeader, Panel, SectionCard, StatCard } from '../../../components/AppUI';
 import api from '../../../services/api';
+
+const ADMIN_ACTIONS = [
+  'Review registered users and the role each one holds',
+  'Monitor employer businesses and their published vacancies',
+  'Take down inappropriate or fake listings',
+];
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
@@ -10,54 +17,72 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     api.get('/admin/stats')
       .then((res) => setStats(res.data))
-      .catch((err) => setError(err.response?.data?.error || 'Failed to load platform stats'))
+      .catch((err) => setError(err.response?.data?.error || 'Could not load platform stats.'))
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner className="py-12" size="lg" />;
-  }
-
-  if (error) {
-    return (
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Super Admin Dashboard</h1>
-        <p className="mt-4 text-red-600">{error}</p>
-      </div>
-    );
-  }
+  const tiles = [
+    { label: 'Total users', value: stats?.totalUsers },
+    { label: 'Candidates', value: stats?.candidates },
+    { label: 'Employers', value: stats?.employers },
+    { label: 'Active vacancies', value: stats?.activeJobs },
+    { label: 'Applications', value: stats?.totalApplications },
+  ];
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900">Super Admin Dashboard</h1>
-      <p className="mt-2 text-gray-600">Platform overview for SkillBridge LK.</p>
+    <div className="flex flex-col gap-10">
+      <PageHeader
+        eyebrow="Platform admin"
+        title="How SkillBridge LK is being used."
+        lead="A read-only view of accounts, vacancies and applications across the platform."
+      />
 
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: 'Total Users', value: stats?.totalUsers ?? '—' },
-          { label: 'Candidates', value: stats?.candidates ?? '—' },
-          { label: 'Employers', value: stats?.employers ?? '—' },
-          { label: 'Active Jobs', value: stats?.activeJobs ?? '—' },
-          { label: 'Applications', value: stats?.totalApplications ?? '—' },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">{stat.label}</p>
-            <p className="mt-1 text-3xl font-bold text-brand-700">{stat.value}</p>
-          </div>
-        ))}
+      {loading && <LoadingSpinner className="py-16" size="lg" />}
+
+      {!loading && error && (
+        <ErrorNote>
+          {error} Check that you are signed in as an admin and the API is reachable.
+        </ErrorNote>
+      )}
+
+      {!loading && !error && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {tiles.map((tile) => <StatCard key={tile.label} {...tile} />)}
+        </div>
+      )}
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <SectionCard title="What an admin can do">
+          <ul className="flex flex-col gap-3">
+            {ADMIN_ACTIONS.map((action) => (
+              <li key={action} className="flex items-start gap-2.5 text-sm text-ink-soft">
+                <Icon name="check" size={16} className="mt-0.5 flex-none text-petrol" />
+                {action}
+              </li>
+            ))}
+          </ul>
+        </SectionCard>
+
+        <Panel rail="Account security" foot="Admin accounts are provisioned manually">
+          <p className="text-sm leading-relaxed text-paper/80">
+            Admin accounts are created directly in Supabase and cannot be obtained through public
+            registration. There is no self-service path to this role.
+          </p>
+          <p className="mt-4 flex items-start gap-2.5 rounded border border-paper/15 bg-white/5 px-3.5 py-3 text-[0.8rem] leading-relaxed text-paper/70">
+            <Icon name="spark" size={15} className="mt-0.5 flex-none text-marigold" />
+            The service role key stays on the backend. This dashboard only ever reads through the
+            authenticated API.
+          </p>
+        </Panel>
       </div>
 
-      <div className="mt-8 rounded-xl border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Admin actions</h2>
-        <ul className="mt-4 space-y-2 text-sm text-gray-600">
-          <li>View all registered users and their roles</li>
-          <li>Monitor employer businesses and job listings</li>
-          <li>Disable inappropriate or fake job posts (stretch)</li>
-        </ul>
-        <p className="mt-4 text-xs text-gray-500">
-          Super admin accounts are created manually in Supabase — not via public registration.
+      <Card className="p-6">
+        <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-ink">Moderation</h2>
+        <p className="mt-1.5 max-w-2xl text-sm text-ink-soft">
+          Listing takedown and user management are not built yet. They are the stretch goals for this
+          role, deliberately left out of the MVP scope.
         </p>
-      </div>
+      </Card>
     </div>
   );
 }

@@ -1,23 +1,30 @@
 import StatusBadge from '../../../components/StatusBadge';
+import MatchBadge from '../../../components/MatchBadge';
+import { Card } from '../../../components/AppUI';
 
 export default function ApplicationCard({ application }) {
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
+    <Card className="p-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">{application.jobTitle}</h3>
-          <p className="text-sm text-gray-500">{application.company}</p>
+          <p className="font-mono text-[0.6rem] uppercase tracking-[0.08em] text-ink-soft">
+            {application.company}
+          </p>
+          <h3 className="mt-1 font-display text-lg font-bold tracking-[-0.02em] text-ink">
+            {application.jobTitle}
+          </h3>
         </div>
         <StatusBadge status={application.status} />
       </div>
-      <p className="mt-3 text-sm text-gray-500">
-        Applied: {application.appliedAt}
-      </p>
-      {application.matchPercentage != null && (
-        <p className="mt-1 text-sm text-gray-600">
-          Skill match: {application.matchPercentage}%
-        </p>
-      )}
-    </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-dashed border-line-strong pt-3.5">
+        <span className="font-mono text-[0.56rem] uppercase tracking-[0.07em] text-ink-soft">
+          Applied {application.appliedAt}
+        </span>
+        {application.matchPercentage != null && (
+          <MatchBadge percent={application.matchPercentage} />
+        )}
+      </div>
+    </Card>
   );
 }
