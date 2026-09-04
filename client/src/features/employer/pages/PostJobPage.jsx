@@ -1,70 +1,94 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../../components/Button';
-import Input from '../../../components/Input';
+import {
+  CheckChip, Icon, InfoNote, PageHeader, SectionCard, SelectField, TextField, TextareaField,
+} from '../../../components/AppUI';
 import { JOB_CATEGORIES, JOB_TYPES, WORK_MODES } from '../../../constants';
 
-export default function PostJobPage() {
-  return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-bold text-gray-900">Post a Job</h1>
-      <p className="mt-2 text-gray-600">Create a new job listing for candidates to apply.</p>
+const COMMON_SKILLS = [
+  'React', 'JavaScript', 'TypeScript', 'HTML', 'CSS', 'Node.js', 'Git', 'SQL',
+  'Figma', 'Canva', 'Microsoft Excel', 'Communication', 'Customer Service',
+  'Social Media Marketing', 'Content Writing', 'Accounting', 'Data Entry', 'Sales',
+];
 
-      {/* TODO: Implement job posting — POST /api/jobs */}
-      <form className="mt-8 space-y-4 rounded-xl border bg-white p-6 shadow-sm" onSubmit={(e) => e.preventDefault()}>
-        <Input label="Job Title" name="title" placeholder="e.g. Frontend Development Intern" required />
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Description</label>
-          <textarea
-            rows={5}
-            className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-            placeholder="Describe the role, responsibilities, and requirements..."
-            required
-          />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">Category</label>
-            <select className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" required>
-              {JOB_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+export default function PostJobPage() {
+  const [skills, setSkills] = useState([]);
+
+  const toggleSkill = (skill) => setSkills((current) => (
+    current.includes(skill) ? current.filter((s) => s !== skill) : [...current, skill]
+  ));
+
+  // TODO: Submit to API — POST /api/jobs
+  const handleSubmit = (event) => event.preventDefault();
+
+  return (
+    <div className="mx-auto flex max-w-3xl flex-col gap-8">
+      <PageHeader
+        eyebrow="New vacancy"
+        title="Describe the role, then the skills."
+        lead="The skills you list here are what candidates are matched against, so keep them honest."
+      />
+
+      <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+        <SectionCard title="The role">
+          <div className="flex flex-col gap-4">
+            <TextField
+              label="Job title"
+              name="title"
+              required
+              placeholder="e.g. Frontend Development Intern"
+            />
+            <TextareaField
+              label="Description"
+              name="description"
+              rows={5}
+              required
+              placeholder="What the person would work on, who they would work with, and what they would learn."
+            />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <SelectField label="Category" name="category" options={JOB_CATEGORIES} required />
+              <SelectField label="Opportunity type" name="jobType" options={JOB_TYPES} required />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField label="Location" name="location" placeholder="e.g. Colombo" />
+              <SelectField label="Work mode" name="workMode" options={WORK_MODES} />
+            </div>
+            <TextField label="Application deadline" type="date" name="deadline" />
           </div>
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">Job Type</label>
-            <select className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" required>
-              {JOB_TYPES.map((type) => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
+        </SectionCard>
+
+        <SectionCard title="Required skills">
+          <p className="mb-4 text-sm text-ink-soft">
+            Pick what the role genuinely needs. A shorter, honest list produces more useful matches
+            than a long wish list — every extra skill lowers everyone&apos;s percentage.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {COMMON_SKILLS.map((skill) => (
+              <CheckChip
+                key={skill}
+                name="skills"
+                value={skill}
+                checked={skills.includes(skill)}
+                onChange={() => toggleSkill(skill)}
+              />
+            ))}
           </div>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Input label="Location" name="location" />
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">Work Mode</label>
-            <select className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-              {WORK_MODES.map((mode) => (
-                <option key={mode} value={mode}>{mode}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Required Skills</label>
-          <input
-            type="text"
-            className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-            placeholder="e.g. React, JavaScript, CSS (comma-separated)"
-          />
-          <p className="text-xs text-gray-500">Select at least one required skill.</p>
-        </div>
-        <Input label="Deadline" type="date" name="deadline" />
-        <div className="flex justify-end gap-3">
-          <Link to="/employer/dashboard">
-            <Button variant="secondary">Cancel</Button>
-          </Link>
-          <Button type="submit">Publish Job</Button>
+          <p className="mt-4 font-mono text-[0.58rem] uppercase tracking-[0.08em] text-ink-soft">
+            {skills.length} required {skills.length === 1 ? 'skill' : 'skills'}
+            {skills.length === 0 && ' · select at least one'}
+          </p>
+        </SectionCard>
+
+        <InfoNote>
+          Candidates see the full skill list on the vacancy, with the ones they already have marked.
+        </InfoNote>
+
+        <div className="flex flex-wrap justify-end gap-3">
+          <Link to="/employer/dashboard"><Button variant="secondary">Cancel</Button></Link>
+          <Button type="submit" disabled={skills.length === 0}>
+            Publish vacancy <Icon size={15} />
+          </Button>
         </div>
       </form>
     </div>

@@ -10,7 +10,7 @@
   --ink-soft: #5a6b80;
 
   /* Paper — cream and off-white palette */
-  --paper: #F5F5F0;
+  --paper: #edefe8;
   --paper-light: #FDF0E0;
   --paper-2: #e3e7dd;
   --card: #fbfcf9;
@@ -60,13 +60,6 @@
   h2 { @apply text-3xl md:text-4xl; }
   h3 { @apply text-xl md:text-2xl; }
 
-  button {
-    background-color: var(--button-bg);
-    color: var(--ink);
-    border: 1px solid #e0d7c3;
-  }
-
-  button:hover {
-    background-color: #f5e8d7;
-  }
+  /* Buttons are owned by the Button component, not a global element rule —
+     a bare element selector here silently fought every component class. */
 }

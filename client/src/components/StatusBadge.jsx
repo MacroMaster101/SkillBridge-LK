@@ -1,12 +1,15 @@
-const statusMap = {
-  'Applied': 'status-applied',
-  'Under Review': 'status-under-review',
-  'Shortlisted': 'status-shortlisted',
-  'Rejected': 'status-rejected',
-  'Hired': 'status-hired'
+import { Badge } from './AppUI';
+import { STATUS_LABELS } from '../constants';
+
+const TONES = {
+  APPLIED: 'quiet',
+  UNDER_REVIEW: 'marigold',
+  SHORTLISTED: 'petrol',
+  REJECTED: 'madder',
+  HIRED: 'petrol',
 };
 
 export default function StatusBadge({ status }) {
-  const cssClass = statusMap[status] || 'status-applied';
-  return <span className={`badge ${cssClass}`}>{status}</span>;
+  const key = String(status || '').toUpperCase().replace(/ /g, '_');
+  return <Badge tone={TONES[key] || 'quiet'}>{STATUS_LABELS[key] || status}</Badge>;
 }

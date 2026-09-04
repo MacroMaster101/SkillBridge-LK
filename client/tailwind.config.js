@@ -25,7 +25,7 @@ export default {
           soft: '#5a6b80',
         },
         paper: {
-          DEFAULT: '#F5F5F0',
+          DEFAULT: '#edefe8',
           light: '#FDF0E0',
           2: '#e3e7dd',
         },
@@ -43,8 +43,20 @@ export default {
         mono: ["'Martian Mono'", 'ui-monospace', "'Cascadia Mono'", 'monospace'],
       },
       backgroundColor: {
-        page: '#F5F5F0',
+        page: '#edefe8',
         button: '#FDF0E0',
+      },
+      borderColor: {
+        line: '#d3d8cc',
+        'line-strong': '#b9c0b1',
+      },
+      boxShadow: {
+        // The landing page's signature hard offset — no blur, no softness.
+        signal: '4px 4px 0 #e9a227',
+        'signal-lg': '6px 6px 0 #e9a227',
+        ink: '4px 4px 0 #14202e',
+        quiet: '4px 4px 0 #b9c0b1',
+        card: '0 1px 0 rgba(20,32,46,0.06), 0 12px 28px -22px rgba(20,32,46,0.55)',
       },
     },
   },

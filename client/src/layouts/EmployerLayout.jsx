@@ -15,7 +15,7 @@ export default function EmployerLayout() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-paper">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -33,9 +33,9 @@ export default function EmployerLayout() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col bg-paper text-ink">
       <Navbar links={employerLinks} showAuth />
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
         <Outlet />
       </main>
     </div>
