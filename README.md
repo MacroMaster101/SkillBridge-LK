@@ -275,7 +275,7 @@ Set the same environment variables in each host's dashboard — local `.env` fil
 
 | Role | Email | Password |
 |---|---|---|
-| 🧑‍🎓 Candidate | `_TBD_` | `_TBD_` |
+| 🧑‍🎓 Candidate |  | `_TBD_` |
 | 🏢 Employer | `_TBD_` | `_TBD_` |
 
 ---
@@ -286,10 +286,10 @@ Set the same environment variables in each host's dashboard — local `.env` fil
 
 | # | Name | Student ID | Focus area |
 |---|---|---|---|
-| 1 | `_TBD_` | `_TBD_` | Candidate frontend |
-| 2 | `_TBD_` | `_TBD_` | Employer frontend |
-| 3 | `_TBD_` | `_TBD_` | Backend + Supabase |
-| 4 | `_TBD_` | `_TBD_` | Recommendation + integration + deployment |
+| 1 | Bolonne B.R.M. | IT24102050 | Candidate frontend |
+| 2 | J.L.K.L. Liyanage | IT24101927 | Employer frontend |
+| 3 | Jayasekara C.D | IT24103494 | Employer Backend + Supabase |
+| 4 | Kodagoda D.S | IT24101613 | Candidate Backend|
 
 ---
 
@@ -299,10 +299,10 @@ Set the same environment variables in each host's dashboard — local `.env` fil
 
 | Member | Contribution |
 |---|---|
-| `_TBD_` | Candidate onboarding form, candidate dashboard, application tracking UI |
-| `_TBD_` | Employer profile setup, job posting form, applicant management UI |
-| `_TBD_` | Supabase schema and RLS, Express API, authentication middleware |
-| `_TBD_` | Skill-match logic, frontend/backend integration, deployment |
+| Bolonne B.R.M. | Candidate onboarding form, candidate dashboard, application tracking UI |
+| Kodagoda D.S. | Employer profile setup, job posting form, applicant management UI |
+| Jayasekara C.D.| Supabase schema and RLS, Express API, authentication middleware |
+| J.L.K.L. Liyanage | Skill-match logic, frontend/backend integration, deployment |
 
 ---
 
