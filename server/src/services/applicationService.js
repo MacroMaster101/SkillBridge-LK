@@ -4,12 +4,22 @@ import { assertJobOwnership, assertApplicationOwnership } from '../utils/employe
 import { calculateSkillMatch, getMatchedAndMissingSkills } from '../utils/skillMatch.js';
 import { getJobSkills } from './jobService.js';
 
+function parseJobId(jobId) {
+  const parsed = Number(jobId);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new AppError(400, 'Invalid job id.');
+  }
+  return parsed;
+}
+
 // Candidate applies to a job
 export async function applyToJob(jobId, candidateId, message = '') {
+  const numericJobId = parseJobId(jobId);
+
   const { data: job, error: jobError } = await supabase
     .from('jobs')
     .select('id, status')
-    .eq('id', jobId)
+    .eq('id', numericJobId)
     .maybeSingle();
 
   if (jobError) {
@@ -27,7 +37,7 @@ export async function applyToJob(jobId, candidateId, message = '') {
   const { data: existing } = await supabase
     .from('applications')
     .select('id')
-    .eq('job_id', jobId)
+    .eq('job_id', numericJobId)
     .eq('candidate_id', candidateId)
     .maybeSingle();
 
@@ -38,7 +48,7 @@ export async function applyToJob(jobId, candidateId, message = '') {
   const { data, error } = await supabase
     .from('applications')
     .insert({
-      job_id: jobId,
+      job_id: numericJobId,
       candidate_id: candidateId,
       message: message ?? null,
       status: 'APPLIED',
@@ -127,9 +137,10 @@ export async function getMyApplications(candidateId) {
 
 // Employer — list applicants for one of their jobs
 export async function getJobApplications(jobId, ownerId) {
-  await assertJobOwnership(jobId, ownerId);
+  const numericJobId = parseJobId(jobId);
+  await assertJobOwnership(numericJobId, ownerId);
 
-  const jobSkills = await getJobSkills(jobId);
+  const jobSkills = await getJobSkills(numericJobId);
 
   const { data: applications, error } = await supabase
     .from('applications')
@@ -146,7 +157,7 @@ export async function getJobApplications(jobId, ownerId) {
         candidate_skills ( skills ( name ) )
       )
     `)
-    .eq('job_id', jobId)
+    .eq('job_id', numericJobId)
     .order('applied_at', { ascending: false });
 
   if (error) {

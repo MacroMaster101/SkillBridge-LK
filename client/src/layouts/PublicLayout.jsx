@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Brand, Action, Icon, Trilingual } from '../components/PublicUI';
+import { useAuth } from '../hooks/useAuth';
+import { getHomeRoute } from '../features/auth/services/authService';
 import '../public.css';
 
 const TITLES = {
@@ -14,6 +16,8 @@ const TITLES = {
 export default function PublicLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname, hash } = useLocation();
+  const { loading, isAuthenticated, profile } = useAuth();
+  const dashboardPath = profile?.role ? getHomeRoute(profile.role) : '/candidate/dashboard';
 
   useEffect(() => {
     setMenuOpen(false);
@@ -38,8 +42,17 @@ export default function PublicLayout() {
             <NavLink to="/employers">For employers</NavLink>
           </nav>
           <div className="sb-nav-actions">
-            <Link className="sb-sign-in" to="/login">Log in</Link>
-            <Action to="/register">Create account <Icon size={16} /></Action>
+            {!loading && isAuthenticated ? (
+              <>
+                <Link className="sb-sign-in" to={dashboardPath}>Dashboard</Link>
+                <Action to={dashboardPath}>My account <Icon size={16} /></Action>
+              </>
+            ) : (
+              <>
+                <Link className="sb-sign-in" to="/login">Log in</Link>
+                <Action to="/register">Create account <Icon size={16} /></Action>
+              </>
+            )}
           </div>
           <button
             type="button"
@@ -58,8 +71,14 @@ export default function PublicLayout() {
             <Link to="/jobs">Find opportunities</Link>
             <Link to="/#how-it-works" onClick={() => setMenuOpen(false)}>How it works</Link>
             <Link to="/employers">For employers</Link>
-            <Link to="/login">Log in</Link>
-            <Link to="/register">Create account</Link>
+            {!loading && isAuthenticated ? (
+              <Link to={dashboardPath}>Dashboard</Link>
+            ) : (
+              <>
+                <Link to="/login">Log in</Link>
+                <Link to="/register">Create account</Link>
+              </>
+            )}
           </nav>
         )}
       </header>

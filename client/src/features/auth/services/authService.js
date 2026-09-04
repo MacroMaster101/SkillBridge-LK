@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../../../services/supabase';
+import { supabase, isSupabaseConfigured, syncAuthSession } from '../../../services/supabase';
 import { ROLES } from '../../../constants';
 
 export function getHomeRoute(role) {
@@ -44,6 +44,7 @@ export async function signUp({ email, password, fullName, role }) {
   });
 
   if (error) throw error;
+  syncAuthSession(data.session);
   return data;
 }
 
@@ -58,6 +59,7 @@ export async function signIn({ email, password }) {
   });
 
   if (error) throw error;
+  syncAuthSession(data.session);
   return data;
 }
 
