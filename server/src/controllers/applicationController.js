@@ -1,19 +1,15 @@
 import { applySchema } from '../validators/schemas.js';
-import * as applicationService from '../services/applicationService.js';
+import * as service from '../services/applicationService.js';
 
+// Candidate — apply to a job
 export async function applyToJob(req, res, next) {
-import { applySchema } from "../validators/schemas.js";
-import * as service from "../services/applicationService.js";
-
-// Feature 4 — Candidate applies to a job
-export async function applyToJob(req, res) {
   const parsed = applySchema.safeParse(req.body || {});
   if (!parsed.success) {
     return res.status(400).json({ message: parsed.error.issues[0].message });
   }
 
   try {
-    const application = await applicationService.applyToJob(
+    const application = await service.applyToJob(
       req.params.jobId,
       req.user.id,
       parsed.data.message,
@@ -24,30 +20,13 @@ export async function applyToJob(req, res) {
   }
 }
 
+// Candidate — application dashboard
 export async function getMyApplications(req, res, next) {
   try {
-    const applications = await applicationService.getMyApplications(req.user.id);
+    const applications = await service.getMyApplications(req.user.id);
     res.json(applications);
   } catch (err) {
-    next(err)
-  try {
-    const result = await service.applyToJob(
-      req.user.id, Number(req.params.jobId), parsed.data.message
-    );
-    res.status(201).json(result);
-  } catch (e) {
-    res.status(e.status || 500).json({ message: e.message || "Application failed." });
-  }
-}
-
-// Feature 5 — Candidate application dashboard
-export async function getMyApplications(req, res) {
-  try {
-    const apps = await service.getMyApplications(req.user.id);
-    res.json(apps);
-  } catch (e) {
-    res.status(500).json({ message: "Unable to load applications." });
-
+    next(err);
   }
 }
 
