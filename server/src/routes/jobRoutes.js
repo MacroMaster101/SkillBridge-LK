@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { requireAuth } from '../middleware/auth.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { jobSchema } from '../validators/schemas.js';
@@ -8,10 +7,10 @@ import * as applicationController from '../controllers/applicationController.js'
 
 const router = Router();
 
-router.get('/', requireAuth, jobController.getJobs);
-router.post('/:jobId/apply', requireAuth, applicationController.applyToJob);
+// Browsing is public — the landing and jobs pages rely on it without a session.
 router.get('/', jobController.getJobs);
 router.get('/:id', jobController.getJobById);
+
 router.post('/', authenticate, requireRole('employer'), validate(jobSchema), jobController.createJob);
 router.post('/:jobId/apply', authenticate, requireRole('candidate'), applicationController.applyToJob);
 router.get('/:jobId/applications', authenticate, requireRole('employer'), applicationController.getJobApplications);
