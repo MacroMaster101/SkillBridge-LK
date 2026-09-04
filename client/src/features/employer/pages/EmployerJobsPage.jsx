@@ -1,46 +1,62 @@
 import { Link } from 'react-router-dom';
 import Button from '../../../components/Button';
+import { Badge, Card, EmptyState, Icon, PageHeader, InfoNote } from '../../../components/AppUI';
 
-// TODO: Replace with API call — GET employer jobs
+// TODO: Replace with API call — employer's own jobs
 const PLACEHOLDER_JOBS = [];
 
-export default function EmployerJobsPage() {
+function JobRow({ job }) {
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Jobs</h1>
-          <p className="mt-2 text-gray-600">Manage your active job listings.</p>
+    <Card className="flex flex-wrap items-center justify-between gap-4 p-5">
+      <div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h3 className="font-display text-lg font-bold tracking-[-0.02em] text-ink">{job.title}</h3>
+          <Badge tone={job.status === 'ACTIVE' ? 'petrol' : 'quiet'}>{job.status || 'Active'}</Badge>
         </div>
-        <Link to="/employer/post-job">
-          <Button>Post New Job</Button>
-        </Link>
+        <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-sm text-ink-soft">
+          <Icon name="pin" size={14} />{job.location}
+          <span className="opacity-40">·</span>{job.jobType}
+          <span className="opacity-40">·</span>
+          <span className="font-mono text-[0.6rem] uppercase tracking-[0.07em]">
+            {job.applicantCount ?? 0} {job.applicantCount === 1 ? 'applicant' : 'applicants'}
+          </span>
+        </p>
       </div>
+      <Link to={`/employer/jobs/${job.id}/applicants`}>
+        <Button variant="secondary" size="sm">Review applicants <Icon size={14} /></Button>
+      </Link>
+    </Card>
+  );
+}
 
-      <div className="mt-8 grid gap-4">
-        {PLACEHOLDER_JOBS.length === 0 ? (
-          <div className="rounded-xl border bg-white p-8 text-center shadow-sm">
-            <p className="text-gray-500">No jobs posted yet.</p>
-            <Link to="/employer/post-job" className="mt-4 inline-block">
-              <Button>Create your first job</Button>
-            </Link>
-          </div>
-        ) : (
-          PLACEHOLDER_JOBS.map((job) => (
-            <div key={job.id} className="rounded-xl border bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">{job.title}</h3>
-                  <p className="text-sm text-gray-500">{job.applicantCount} applicants</p>
-                </div>
-                <Link to={`/employer/jobs/${job.id}/applicants`}>
-                  <Button size="sm" variant="secondary">View Applicants</Button>
-                </Link>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+export default function EmployerJobsPage() {
+  const jobs = PLACEHOLDER_JOBS;
+
+  return (
+    <div className="flex flex-col gap-8">
+      <PageHeader
+        eyebrow="Your vacancies"
+        title="Everything you have posted."
+        lead="Open a vacancy to review its applicants and move them through your process."
+        actions={<Link to="/employer/post-job"><Button>Post a vacancy <Icon size={15} /></Button></Link>}
+      />
+
+      <InfoNote>
+        Sample view — your real vacancies appear here once posting is connected to the API.
+      </InfoNote>
+
+      {jobs.length === 0 ? (
+        <EmptyState
+          icon="briefcase"
+          title="No vacancies yet."
+          message="Post a role with the skills it needs, and candidates will be matched against it automatically."
+          action={<Link to="/employer/post-job"><Button size="sm">Post your first vacancy</Button></Link>}
+        />
+      ) : (
+        <div className="grid gap-4">
+          {jobs.map((job) => <JobRow key={job.id} job={job} />)}
+        </div>
+      )}
     </div>
   );
 }

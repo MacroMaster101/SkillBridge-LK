@@ -1,4 +1,7 @@
+import { Link } from 'react-router-dom';
 import ApplicationCard from '../components/ApplicationCard';
+import Button from '../../../components/Button';
+import { EmptyState, Icon, PageHeader, InfoNote } from '../../../components/AppUI';
 
 // TODO: Replace with API call — GET /api/applications/me
 const PLACEHOLDER_APPLICATIONS = [
@@ -13,20 +16,35 @@ const PLACEHOLDER_APPLICATIONS = [
 ];
 
 export default function CandidateApplicationsPage() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900">My Applications</h1>
-      <p className="mt-2 text-gray-600">Track the status of your job applications.</p>
+  const applications = PLACEHOLDER_APPLICATIONS;
 
-      <div className="mt-8 grid gap-4">
-        {PLACEHOLDER_APPLICATIONS.length === 0 ? (
-          <p className="text-gray-500">You haven&apos;t applied to any jobs yet.</p>
-        ) : (
-          PLACEHOLDER_APPLICATIONS.map((app) => (
-            <ApplicationCard key={app.id} application={app} />
-          ))
-        )}
-      </div>
+  return (
+    <div className="flex flex-col gap-8">
+      <PageHeader
+        eyebrow="Your applications"
+        title="Follow every application."
+        lead="Each status change is set by the employer reviewing your application."
+        actions={<Link to="/jobs"><Button variant="secondary">Find more roles <Icon size={15} /></Button></Link>}
+      />
+
+      <InfoNote>
+        Sample data — this list will fill in once applications are connected to the API.
+      </InfoNote>
+
+      {applications.length === 0 ? (
+        <EmptyState
+          icon="briefcase"
+          title="No applications yet."
+          message="When you apply to a role, it appears here so you can follow it from submitted through to a decision."
+          action={<Link to="/jobs"><Button size="sm">Browse opportunities</Button></Link>}
+        />
+      ) : (
+        <div className="grid gap-4">
+          {applications.map((application) => (
+            <ApplicationCard key={application.id} application={application} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

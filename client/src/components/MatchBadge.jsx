@@ -1,12 +1,15 @@
-import { matchLabel } from '../utils/matchSkills';
+import { Badge } from './AppUI';
 
-export default function MatchBadge({ percent }) {
-  const label = matchLabel(percent);
-  let badgeClass = 'badge-low';
+/* Match is skill overlap, so the label describes the overlap rather than
+   implying a verdict on the candidate. */
+function describe(percent) {
+  if (percent >= 80) return 'Strong match';
+  if (percent >= 60) return 'Good match';
+  if (percent >= 40) return 'Partial match';
+  return 'Early match';
+}
 
-  if (percent >= 80) badgeClass = 'badge-excellent';
-  else if (percent >= 60) badgeClass = 'badge-good';
-  else if (percent >= 40) badgeClass = 'badge-partial';
-
-  return <span className={`badge ${badgeClass}`}>{percent}% {label}</span>;
+export default function MatchBadge({ percent = 0 }) {
+  const tone = percent >= 60 ? 'petrol' : percent >= 40 ? 'marigold' : 'quiet';
+  return <Badge tone={tone}>{percent}% · {describe(percent)}</Badge>;
 }

@@ -1,14 +1,21 @@
-const variants = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700 focus:ring-brand-500',
-  secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-brand-500',
-  danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-  ghost: 'text-brand-600 hover:bg-brand-50 focus:ring-brand-500',
+const VARIANTS = {
+  // The landing page's primary: ink block, marigold shadow offset behind it.
+  primary:
+    'bg-ink text-paper border-ink shadow-signal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-signal-lg active:translate-x-px active:translate-y-px',
+  secondary:
+    'bg-transparent text-ink border-ink shadow-quiet hover:bg-card hover:-translate-x-0.5 hover:-translate-y-0.5',
+  signal:
+    'bg-marigold text-ink border-ink shadow-ink hover:-translate-x-0.5 hover:-translate-y-0.5',
+  danger:
+    'bg-madder text-paper border-madder shadow-ink hover:-translate-x-0.5 hover:-translate-y-0.5',
+  ghost:
+    'border-transparent bg-transparent text-petrol hover:bg-petrol-light',
 };
 
-const sizes = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-6 py-3 text-base',
+const SIZES = {
+  sm: 'px-3 py-2 text-[0.62rem]',
+  md: 'px-5 py-3 text-[0.72rem]',
+  lg: 'px-6 py-3.5 text-[0.78rem]',
 };
 
 export default function Button({
@@ -24,7 +31,7 @@ export default function Button({
     <button
       type={type}
       disabled={disabled}
-      className={`inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded border-2 font-mono font-semibold uppercase tracking-[0.02em] transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-ink disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...props}
     >
       {children}
