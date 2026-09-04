@@ -55,29 +55,29 @@ export default function JobFeed() {
 
       <div className="mt-8 grid gap-6 sm:grid-cols-3 mb-8">
         {stats.map((stat) => (
-          <div key={stat.label} className="rounded-xl border bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">{stat.label}</p>
-            <p className="mt-1 text-3xl font-bold text-brand-700">{stat.value}</p>
+          <div key={stat.label} className="rounded-xl border bg-paper shadow-sm p-6">
+            <p className="text-sm text-ink-soft">{stat.label}</p>
+            <p className="mt-1 text-3xl font-bold text-petrol">{stat.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl border bg-white p-6 shadow-sm mb-8">
-        <h2 className="text-lg font-semibold mb-4">Search & Filter</h2>
+      <div className="rounded-xl border bg-paper shadow-sm p-6 mb-8">
+        <h2 className="text-lg font-semibold font-display text-ink mb-4">Search & Filter</h2>
         <div className="space-y-4">
           <input
             type="text"
             placeholder="Search by job title or company..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="block w-full rounded-lg border border-paper-2 px-3 py-2 text-sm bg-white text-ink focus:outline-none focus:ring-2 focus:ring-petrol"
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="block w-full rounded-lg border border-paper-2 px-3 py-2 text-sm bg-white text-ink focus:outline-none focus:ring-2 focus:ring-petrol"
             >
               <option value="">All Categories</option>
               {categories.map(cat => (
@@ -88,7 +88,7 @@ export default function JobFeed() {
             <select
               value={selectedJobType}
               onChange={(e) => setSelectedJobType(e.target.value)}
-              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="block w-full rounded-lg border border-paper-2 px-3 py-2 text-sm bg-white text-ink focus:outline-none focus:ring-2 focus:ring-petrol"
             >
               <option value="">All Job Types</option>
               {jobTypes.map(type => (
@@ -101,7 +101,7 @@ export default function JobFeed() {
             <select
               value={selectedWorkMode}
               onChange={(e) => setSelectedWorkMode(e.target.value)}
-              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="block w-full rounded-lg border border-paper-2 px-3 py-2 text-sm bg-white text-ink focus:outline-none focus:ring-2 focus:ring-petrol"
             >
               <option value="">All Work Modes</option>
               {workModes.map(mode => (
@@ -114,7 +114,7 @@ export default function JobFeed() {
               placeholder="Location"
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="block w-full rounded-lg border border-paper-2 px-3 py-2 text-sm bg-white text-ink focus:outline-none focus:ring-2 focus:ring-petrol"
             />
           </div>
         </div>
@@ -129,28 +129,28 @@ export default function JobFeed() {
           filteredJobs.map(job => (
             <div
               key={job.id}
-              className="rounded-xl border bg-white p-6 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+              className="rounded-xl border bg-paper shadow-sm cursor-pointer hover:shadow-md transition-shadow p-6"
               onClick={() => navigate(`/candidate-new/jobs/${job.id}`)}
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
-                  <p className="text-sm text-gray-500 mt-1">{job.company} • {job.location}</p>
+                  <h3 className="text-lg font-semibold font-display text-ink">{job.title}</h3>
+                  <p className="text-sm text-ink-soft mt-1">{job.company} • {job.location}</p>
                 </div>
                 <MatchBadge percent={getMatchPercent(job)} />
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="inline-block text-xs font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                <span className="inline-block text-xs font-medium bg-petrol-soft text-petrol-ink px-2 py-1 rounded">
                   {job.category}
                 </span>
-                <span className="inline-block text-xs font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                <span className="inline-block text-xs font-medium bg-petrol-soft text-petrol-ink px-2 py-1 rounded">
                   {job.job_type}
                 </span>
-                <span className="inline-block text-xs font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                <span className="inline-block text-xs font-medium bg-petrol-soft text-petrol-ink px-2 py-1 rounded">
                   {job.work_mode}
                 </span>
               </div>
-              <p className="mt-3 text-sm text-gray-600">
+              <p className="mt-3 text-sm text-ink-soft">
                 Posted: {new Date(job.posted_date).toLocaleDateString()}
               </p>
             </div>
