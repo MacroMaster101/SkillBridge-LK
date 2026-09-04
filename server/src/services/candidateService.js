@@ -35,3 +35,12 @@ export async function upsertCandidateProfile(userId, input) {
   if (error) throw new Error(error.message);
   return getCandidateProfile(userId);
 }
+
+export async function setCandidateSkills(userId, skillIds) {
+  await supabase.from("candidate_skills").delete().eq("user_id", userId);
+
+  const rows = skillIds.map((skill_id) => ({ user_id: userId, skill_id }));
+  const { error } = await supabase.from("candidate_skills").insert(rows);
+  if (error) throw new Error(error.message);
+  return getCandidateProfile(userId);
+}
