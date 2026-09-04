@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getCandidate } from '../lib/candidateStorage';
 import { calculateSkillMatch } from '../utils/matchSkills';
 import { mockJobs } from '../data/mockJobs';
-import JobCard from '../components/JobCard';
-import FilterBar from '../components/FilterBar';
+import MatchBadge from '../components/MatchBadge';
 
 export default function JobFeed() {
+  const navigate = useNavigate();
   const candidate = getCandidate();
   const [jobs] = useState(mockJobs);
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,62 +39,124 @@ export default function JobFeed() {
   };
 
   const stats = [
-    { label: 'Total Jobs', value: jobs.length },
-    { label: 'Available', value: filteredJobs.length },
+    { label: 'Available Jobs', value: filteredJobs.length },
     { label: 'Your Skills', value: candidate?.skills?.length || 0 },
+    { label: 'Preferred Categories', value: candidate?.preferredCategories?.length || 0 },
   ];
 
   return (
-    <div className="container">
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ margin: '0 0 8px 0' }}>Find Your Next Opportunity</h1>
-        <p style={{ margin: '0', color: 'var(--color-muted)' }}>Browse and apply to jobs tailored to your skills and preferences.</p>
+    <div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Find Your Next Opportunity</h1>
+          <p className="mt-2 text-gray-600">Browse and apply to jobs tailored to your skills and preferences.</p>
+        </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+      <div className="mt-8 grid gap-6 sm:grid-cols-3 mb-8">
         {stats.map((stat) => (
-          <div key={stat.label} className="card" style={{ textAlign: 'center', padding: '24px' }}>
-            <p style={{ margin: '0 0 8px 0', color: 'var(--color-muted)', fontSize: '0.9rem' }}>{stat.label}</p>
-            <p style={{ margin: '0', fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>{stat.value}</p>
+          <div key={stat.label} className="rounded-xl border bg-white p-6 shadow-sm">
+            <p className="text-sm text-gray-500">{stat.label}</p>
+            <p className="mt-1 text-3xl font-bold text-brand-700">{stat.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="card" style={{ marginBottom: '24px', padding: '24px' }}>
-        <FilterBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          selectedJobType={selectedJobType}
-          onJobTypeChange={setSelectedJobType}
-          selectedWorkMode={selectedWorkMode}
-          onWorkModeChange={setSelectedWorkMode}
-          selectedLocation={selectedLocation}
-          onLocationChange={setSelectedLocation}
-          categories={categories}
-          jobTypes={jobTypes}
-          workModes={workModes}
-        />
+      <div className="rounded-xl border bg-white p-6 shadow-sm mb-8">
+        <h2 className="text-lg font-semibold mb-4">Search & Filter</h2>
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Search by job title or company..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          />
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="">All Categories</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+
+            <select
+              value={selectedJobType}
+              onChange={(e) => setSelectedJobType(e.target.value)}
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="">All Job Types</option>
+              {jobTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <select
+              value={selectedWorkMode}
+              onChange={(e) => setSelectedWorkMode(e.target.value)}
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="">All Work Modes</option>
+              {workModes.map(mode => (
+                <option key={mode} value={mode}>{mode}</option>
+              ))}
+            </select>
+
+            <input
+              type="text"
+              placeholder="Location"
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
       </div>
 
-      {filteredJobs.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '60px 24px' }}>
-          <p style={{ color: 'var(--color-muted)', fontSize: '1.1rem', margin: '0' }}>
-            No jobs found matching your criteria.
-          </p>
-        </div>
-      ) : (
-        <div>
-          {filteredJobs.map(job => (
-            <JobCard
+      <div className="mt-8 space-y-4">
+        {filteredJobs.length === 0 ? (
+          <div className="rounded-xl border bg-white p-8 text-center shadow-sm">
+            <p className="text-gray-500">No jobs found matching your criteria.</p>
+          </div>
+        ) : (
+          filteredJobs.map(job => (
+            <div
               key={job.id}
-              job={job}
-              matchPercent={getMatchPercent(job)}
-            />
-          ))}
-        </div>
-      )}
+              className="rounded-xl border bg-white p-6 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate(`/candidate-new/jobs/${job.id}`)}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{job.company} • {job.location}</p>
+                </div>
+                <MatchBadge percent={getMatchPercent(job)} />
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="inline-block text-xs font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                  {job.category}
+                </span>
+                <span className="inline-block text-xs font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                  {job.job_type}
+                </span>
+                <span className="inline-block text-xs font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                  {job.work_mode}
+                </span>
+              </div>
+              <p className="mt-3 text-sm text-gray-600">
+                Posted: {new Date(job.posted_date).toLocaleDateString()}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

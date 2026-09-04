@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getCandidate } from '../lib/candidateStorage';
 import { supabase } from '../lib/supabaseClient';
 import { mockJobs } from '../data/mockJobs';
+import Button from '../components/Button';
 
 export default function ApplyForm() {
   const { id } = useParams();
@@ -17,9 +18,11 @@ export default function ApplyForm() {
 
   if (!job) {
     return (
-      <div className="container" style={{ textAlign: 'center', paddingTop: '60px' }}>
-        <h1>Job Not Found</h1>
-        <button className="btn" onClick={() => navigate('/')}>Back to Jobs</button>
+      <div className="text-center py-12">
+        <h1 className="text-2xl font-bold text-gray-900">Job Not Found</h1>
+        <Link to="/candidate-new/">
+          <Button className="mt-4">Back to Jobs</Button>
+        </Link>
       </div>
     );
   }
@@ -68,7 +71,7 @@ export default function ApplyForm() {
 
       setSubmitted(true);
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/candidate-new/dashboard');
       }, 1000);
     } catch (error) {
       setErrors({ submit: 'Failed to submit application. Please try again.' });
@@ -79,105 +82,81 @@ export default function ApplyForm() {
 
   if (submitted) {
     return (
-      <div className="container" style={{ textAlign: 'center', paddingTop: '60px' }}>
-        <h1 style={{ color: 'var(--color-excellent)' }}>Application submitted successfully!</h1>
-        <p style={{ color: 'var(--color-muted)' }}>Redirecting to your dashboard...</p>
+      <div className="text-center py-12">
+        <h1 className="text-2xl font-bold text-green-600">Application submitted successfully!</h1>
+        <p className="text-gray-600 mt-2">Redirecting to your dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="container" style={{ maxWidth: '700px', paddingTop: '40px', paddingBottom: '40px' }}>
-      <button
-        className="btn"
-        style={{ marginBottom: '24px', background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-border)', cursor: 'pointer' }}
-        onClick={() => navigate(`/jobs/${job.id}`)}
-      >
+    <div className="mx-auto max-w-2xl">
+      <Link to={`/candidate-new/jobs/${job.id}`} className="text-sm text-blue-600 hover:text-blue-800 font-medium mb-4 inline-block">
         ← Back to Job
-      </button>
+      </Link>
 
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ margin: '0 0 8px 0' }}>Apply Now</h1>
-        <p style={{ margin: '0', color: 'var(--color-muted)' }}>Submit your application for {job.title} at {job.company}</p>
-      </div>
+      <h1 className="text-2xl font-bold text-gray-900">Apply Now</h1>
+      <p className="mt-2 text-gray-600">Submit your application for {job.title} at {job.company}</p>
 
-      <div className="card" style={{ marginBottom: '24px' }}>
-        <h2 style={{ marginTop: '0', marginBottom: '20px', fontSize: '1.1rem' }}>Job Details</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-          <div>
-            <p style={{ margin: '0 0 4px 0', color: 'var(--color-muted)', fontSize: '0.85rem' }}>POSITION</p>
-            <p style={{ margin: '0', fontWeight: 600 }}>{job.title}</p>
+      <div className="mt-8 rounded-xl border bg-white p-6 shadow-sm space-y-4">
+        <h2 className="text-lg font-semibold">Job Details</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-500">POSITION</p>
+            <p className="text-gray-900">{job.title}</p>
           </div>
-          <div>
-            <p style={{ margin: '0 0 4px 0', color: 'var(--color-muted)', fontSize: '0.85rem' }}>COMPANY</p>
-            <p style={{ margin: '0', fontWeight: 600 }}>{job.company}</p>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-500">COMPANY</p>
+            <p className="text-gray-900">{job.company}</p>
           </div>
-          <div>
-            <p style={{ margin: '0 0 4px 0', color: 'var(--color-muted)', fontSize: '0.85rem' }}>LOCATION</p>
-            <p style={{ margin: '0', fontWeight: 600 }}>{job.location}</p>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-500">LOCATION</p>
+            <p className="text-gray-900">{job.location}</p>
           </div>
-          <div>
-            <p style={{ margin: '0 0 4px 0', color: 'var(--color-muted)', fontSize: '0.85rem' }}>JOB TYPE</p>
-            <p style={{ margin: '0', fontWeight: 600 }}>{job.job_type}</p>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-500">JOB TYPE</p>
+            <p className="text-gray-900">{job.job_type}</p>
           </div>
         </div>
       </div>
 
-      <div className="card">
-        <h2 style={{ marginTop: '0', marginBottom: '20px', fontSize: '1.1rem' }}>Application</h2>
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500 }}>Your Name</label>
-            <input
-              type="text"
-              value={candidate?.name || ''}
-              disabled
-              style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}
-            />
-          </div>
+      <form className="mt-8 space-y-4 rounded-xl border bg-white p-6 shadow-sm" onSubmit={handleSubmit}>
+        <h2 className="text-lg font-semibold">Your Application</h2>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500 }}>
-              Cover Message (Optional)
-            </label>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Tell the employer why you're a great fit for this role..."
-              style={{ minHeight: '140px', padding: '10px' }}
-            />
-            <p style={{ margin: '6px 0 0 0', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
-              Minimum 10 characters if filled
-            </p>
-            {errors.message && <div className="field-error">{errors.message}</div>}
-          </div>
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">Your Name</label>
+          <input
+            type="text"
+            value={candidate?.name || ''}
+            disabled
+            className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-gray-50"
+          />
+        </div>
 
-          {errors.submit && <div className="field-error">{errors.submit}</div>}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">Cover Message (Optional)</label>
+          <textarea
+            rows={5}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            placeholder="Tell the employer why you're a great fit for this role..."
+          />
+          <p className="text-xs text-gray-500">Minimum 10 characters if filled</p>
+          {errors.message && <p className="text-xs text-red-600">{errors.message}</p>}
+        </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-            <button
-              type="button"
-              className="btn"
-              onClick={() => navigate(`/jobs/${job.id}`)}
-              style={{ background: 'var(--color-border)', color: 'var(--color-text)', flex: 1 }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn"
-              disabled={isSubmitting}
-              style={{
-                flex: 1,
-                opacity: isSubmitting ? 0.6 : 1,
-                cursor: isSubmitting ? 'not-allowed' : 'pointer'
-              }}
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit Application'}
-            </button>
-          </div>
-        </form>
-      </div>
+        {errors.submit && <p className="text-xs text-red-600">{errors.submit}</p>}
+
+        <div className="flex justify-end gap-3 pt-4">
+          <Link to={`/candidate-new/jobs/${job.id}`}>
+            <Button variant="secondary">Cancel</Button>
+          </Link>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit Application'}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

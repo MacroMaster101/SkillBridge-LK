@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveCandidate } from '../lib/candidateStorage';
+import Button from '../components/Button';
 
 const USER_TYPES = ['Undergraduate Student', 'Diploma-HND Student', 'Recent Graduate', 'Non-Student Job Seeker'];
 const CATEGORIES = ['Software / IT', 'Design', 'Marketing', 'Sales', 'Admin'];
@@ -70,129 +71,130 @@ export default function Onboarding() {
     };
 
     saveCandidate(candidate);
-    navigate('/');
+    navigate('/candidate-new/');
   };
 
   return (
-    <div className="container" style={{ maxWidth: '700px', paddingTop: '40px', paddingBottom: '40px' }}>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ margin: '0 0 8px 0' }}>Complete Your Profile</h1>
-        <p style={{ margin: '0', color: 'var(--color-muted)' }}>
-          Tell us about your skills and preferences so we can recommend the best jobs for you.
-        </p>
-      </div>
+    <div className="mx-auto max-w-2xl">
+      <h1 className="text-2xl font-bold text-gray-900">Complete Your Profile</h1>
+      <p className="mt-2 text-gray-600">Tell us about your skills and preferences so we can recommend the best jobs for you.</p>
 
-      <form onSubmit={handleSubmit}>
-        <div className="card" style={{ marginBottom: '24px' }}>
-          <h2 style={{ marginTop: '0', marginBottom: '20px', fontSize: '1.2rem' }}>Basic Information</h2>
+      <form className="mt-8 space-y-6 rounded-xl border bg-white p-6 shadow-sm" onSubmit={handleSubmit}>
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500 }}>Full Name *</label>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Full Name *</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
               placeholder="Enter your full name"
             />
-            {errors.name && <div className="field-error">{errors.name}</div>}
+            {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500 }}>User Type *</label>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">User Type *</label>
             <select
               name="type"
               value={formData.type}
               onChange={handleChange}
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             >
               <option value="">Select your current status</option>
               {USER_TYPES.map(type => (
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>
-            {errors.type && <div className="field-error">{errors.type}</div>}
+            {errors.type && <p className="text-xs text-red-600">{errors.type}</p>}
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500 }}>Location (Optional)</label>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Location (Optional)</label>
             <input
               type="text"
               name="location"
               value={formData.location}
               onChange={handleChange}
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
               placeholder="e.g. Colombo"
             />
           </div>
         </div>
 
-        <div className="card" style={{ marginBottom: '24px' }}>
-          <h2 style={{ marginTop: '0', marginBottom: '20px', fontSize: '1.2rem' }}>Skills & Preferences</h2>
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900">Skills & Preferences</h2>
 
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500 }}>Skills *</label>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Skills *</label>
             <input
               type="text"
               name="skills"
               value={formData.skills}
               onChange={handleChange}
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
               placeholder="e.g. React, JavaScript, CSS, Git"
             />
-            <p style={{ margin: '6px 0 0 0', fontSize: '0.85rem', color: 'var(--color-muted)' }}>Comma-separated list of your skills</p>
-            {errors.skills && <div className="field-error">{errors.skills}</div>}
+            <p className="text-xs text-gray-500">Comma-separated list of your skills</p>
+            {errors.skills && <p className="text-xs text-red-600">{errors.skills}</p>}
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', marginBottom: '12px', fontWeight: 500 }}>Preferred Job Categories</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px' }}>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Preferred Job Categories</label>
+            <div className="flex flex-wrap gap-2">
               {CATEGORIES.map(cat => (
-                <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '8px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                <label key={cat} className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm cursor-pointer hover:bg-gray-50">
                   <input
                     type="checkbox"
                     checked={formData.preferredCategories.includes(cat)}
                     onChange={(e) => handleCheckbox('preferredCategories', cat, e.target.checked)}
                   />
-                  <span style={{ fontSize: '0.95rem' }}>{cat}</span>
+                  {cat}
                 </label>
               ))}
             </div>
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', marginBottom: '12px', fontWeight: 500 }}>Preferred Job Types</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Preferred Job Types</label>
+            <div className="flex flex-wrap gap-2">
               {JOB_TYPES.map(type => (
-                <label key={type} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '8px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                <label key={type} className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm cursor-pointer hover:bg-gray-50">
                   <input
                     type="checkbox"
                     checked={formData.preferredJobTypes.includes(type)}
                     onChange={(e) => handleCheckbox('preferredJobTypes', type, e.target.checked)}
                   />
-                  <span style={{ fontSize: '0.95rem' }}>{type}</span>
+                  {type}
                 </label>
               ))}
             </div>
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '12px', fontWeight: 500 }}>Preferred Work Mode</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Preferred Work Mode</label>
+            <div className="flex flex-wrap gap-2">
               {WORK_MODES.map(mode => (
-                <label key={mode} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '8px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                <label key={mode} className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm cursor-pointer hover:bg-gray-50">
                   <input
                     type="checkbox"
                     checked={formData.preferredWorkModes.includes(mode)}
                     onChange={(e) => handleCheckbox('preferredWorkModes', mode, e.target.checked)}
                   />
-                  <span style={{ fontSize: '0.95rem' }}>{mode}</span>
+                  {mode}
                 </label>
               ))}
             </div>
           </div>
         </div>
 
-        <button type="submit" className="btn" style={{ width: '100%', padding: '12px 18px', fontSize: '1rem' }}>
-          Get Started
-        </button>
+        <div className="flex justify-end gap-3">
+          <Button variant="secondary" onClick={() => navigate('/candidate-new/')}>Skip for now</Button>
+          <Button type="submit">Get Started</Button>
+        </div>
       </form>
     </div>
   );
