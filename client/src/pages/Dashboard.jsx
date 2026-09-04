@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getCandidate } from '../lib/candidateStorage';
 import { supabase } from '../lib/supabaseClient';
 import StatusBadge from '../components/StatusBadge';
+import Button from '../components/Button';
 import { mockJobs } from '../data/mockJobs';
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const candidate = getCandidate();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,64 +57,67 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="container" style={{ textAlign: 'center', paddingTop: '60px' }}>
-        <p>Loading applications...</p>
+      <div className="text-center py-12">
+        <p className="text-gray-600">Loading applications...</p>
       </div>
     );
   }
 
   return (
-    <div className="container">
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ margin: '0 0 8px 0' }}>My Applications</h1>
-        <p style={{ margin: '0', color: 'var(--color-muted)' }}>Track your job applications and their status.</p>
+    <div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Applications</h1>
+          <p className="mt-2 text-gray-600">Track your job applications and their status.</p>
+        </div>
+        <Link to="/candidate-new/">
+          <Button>Browse More Jobs</Button>
+        </Link>
       </div>
 
       {applications.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+        <div className="mt-8 grid gap-6 sm:grid-cols-3 mb-8">
           {stats.map((stat) => (
-            <div key={stat.label} className="card" style={{ textAlign: 'center', padding: '24px' }}>
-              <p style={{ margin: '0 0 8px 0', color: 'var(--color-muted)', fontSize: '0.9rem' }}>{stat.label}</p>
-              <p style={{ margin: '0', fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>{stat.value}</p>
+            <div key={stat.label} className="rounded-xl border bg-white p-6 shadow-sm">
+              <p className="text-sm text-gray-500">{stat.label}</p>
+              <p className="mt-1 text-3xl font-bold text-brand-700">{stat.value}</p>
             </div>
           ))}
         </div>
       )}
 
-      {applications.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '60px 24px' }}>
-          <p style={{ color: 'var(--color-muted)', fontSize: '1.1rem', margin: '0 0 24px 0' }}>
-            You haven't applied to any jobs yet.
-          </p>
-          <button className="btn" onClick={() => navigate('/')}>
-            Browse Jobs
-          </button>
-        </div>
-      ) : (
-        <div>
-          {applications.map((app) => (
-            <div key={app.id} className="card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/jobs/${app.job_id}`)}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
+      <div className="mt-8 space-y-4">
+        {applications.length === 0 ? (
+          <div className="rounded-xl border bg-white p-8 text-center shadow-sm">
+            <p className="text-gray-500 mb-4">You haven't applied to any jobs yet.</p>
+            <Link to="/candidate-new/">
+              <Button>Browse Jobs</Button>
+            </Link>
+          </div>
+        ) : (
+          applications.map((app) => (
+            <div
+              key={app.id}
+              className="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => window.location.href = `/candidate-new/jobs/${app.job_id}`}
+            >
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>{getJobTitle(app.job_id)}</h3>
-                  <p style={{ margin: '0', color: 'var(--color-muted)', fontSize: '0.9rem' }}>
-                    {getJobCompany(app.job_id)}
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900">{getJobTitle(app.job_id)}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{getJobCompany(app.job_id)}</p>
                 </div>
                 <StatusBadge status={app.status} />
               </div>
               {app.message && (
-                <p style={{ margin: '12px 0', fontSize: '0.9rem', color: 'var(--color-muted)', fontStyle: 'italic' }}>
-                  "{app.message}"
-                </p>
+                <p className="mt-3 text-sm text-gray-600 italic">"{app.message}"</p>
               )}
-              <p style={{ margin: '0', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
+              <p className="mt-2 text-xs text-gray-500">
                 Applied: {new Date(app.created_at).toLocaleDateString()}
               </p>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }
