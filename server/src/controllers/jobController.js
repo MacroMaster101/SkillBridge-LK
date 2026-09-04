@@ -1,10 +1,34 @@
-import { listJobs } from "../services/jobService.js";
+import * as jobService from '../services/jobService.js';
 
-export async function getJobs(req, res) {
+export async function getJobs(req, res, next) {
   try {
-    const jobs = await listJobs(req.query, req.user.id);
+    const jobs = await jobService.getActiveJobs({
+      search: req.query.search,
+      category: req.query.category,
+      jobType: req.query.jobType,
+      workMode: req.query.workMode,
+      location: req.query.location,
+    });
     res.json(jobs);
-  } catch (e) {
-    res.status(500).json({ message: "Unable to load jobs." });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getJobById(req, res, next) {
+  try {
+    const job = await jobService.getActiveJobById(req.params.id);
+    res.json(job);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function createJob(req, res, next) {
+  try {
+    const job = await jobService.createJob(req.user.id, req.body);
+    res.status(201).json(job);
+  } catch (err) {
+    next(err);
   }
 }
