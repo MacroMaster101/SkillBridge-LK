@@ -33,7 +33,7 @@ export function requireRole(role) {
       .from('profiles')
       .select('role, full_name')
       .eq('id', req.user.id)
-      .single();
+      .maybeSingle();
 
     if (error || !profile) {
       return res.status(403).json({ error: 'Profile not found' });

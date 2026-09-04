@@ -3,6 +3,7 @@ import candidateRoutes from './candidateRoutes.js';
 import jobRoutes from './jobRoutes.js';
 import applicationRoutes from './applicationRoutes.js';
 import employerRoutes from './employerRoutes.js';
+import adminRoutes from './adminRoutes.js';
 import skillRoutes from './skillRoutes.js';
 
 const router = Router();
@@ -12,5 +13,6 @@ router.use('/skills', skillRoutes);
 router.use('/jobs', jobRoutes);
 router.use('/applications', applicationRoutes);
 router.use('/employers', employerRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;
