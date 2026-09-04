@@ -9,7 +9,7 @@ export function getHomeRoute(role) {
       return '/employer/dashboard';
     case ROLES.CANDIDATE:
     default:
-      return '/candidate/dashboard';
+      return '/candidate-new/';
   }
 }
 
@@ -19,7 +19,7 @@ export function getPostRegisterRoute(role) {
       return '/employer/setup';
     case ROLES.CANDIDATE:
     default:
-      return '/candidate/onboarding';
+      return '/candidate-new/onboarding';
   }
 }
 

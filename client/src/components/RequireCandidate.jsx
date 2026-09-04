@@ -3,7 +3,7 @@ import { hasCandidate } from '../lib/candidateStorage';
 
 export default function RequireCandidate({ children }) {
   if (!hasCandidate()) {
-    return <Navigate to="/onboarding" replace />;
+    return <Navigate to="/candidate-new/onboarding" replace />;
   }
 
   return children;
