@@ -1,15 +1,19 @@
-// TODO: Implement employer profile CRUD with Supabase
+import * as employerService from '../services/employerService.js';
 
-export async function createEmployer(_req, res) {
-  res.status(501).json({
-    error: 'Not implemented',
-    message: 'POST /api/employers — create employer business profile',
-  });
+export async function createEmployer(req, res, next) {
+  try {
+    const employer = await employerService.createEmployerProfile(req.user.id, req.body);
+    res.status(201).json(employer);
+  } catch (err) {
+    next(err);
+  }
 }
 
-export async function getMe(_req, res) {
-  res.status(501).json({
-    error: 'Not implemented',
-    message: 'GET /api/employers/me — fetch employer profile and stats',
-  });
+export async function getMe(req, res, next) {
+  try {
+    const dashboard = await employerService.getEmployerDashboard(req.user.id);
+    res.json(dashboard);
+  } catch (err) {
+    next(err);
+  }
 }
