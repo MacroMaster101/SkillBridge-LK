@@ -23,10 +23,56 @@ const optionalPhone = z
     { message: 'Please enter a valid phone number' },
   );
 
+export const PASSWORD_MIN_LENGTH = 8;
+
+export const CANDIDATE_PASSWORD_RULES = [
+  {
+    id: 'length',
+    label: 'At least 8 characters',
+    test: (password) => password.length >= PASSWORD_MIN_LENGTH,
+  },
+  {
+    id: 'uppercase',
+    label: 'One uppercase letter',
+    test: (password) => /[A-Z]/.test(password),
+  },
+  {
+    id: 'lowercase',
+    label: 'One lowercase letter',
+    test: (password) => /[a-z]/.test(password),
+  },
+  {
+    id: 'number',
+    label: 'One number',
+    test: (password) => /\d/.test(password),
+  },
+  {
+    id: 'special',
+    label: 'One special character',
+    test: (password) => /[^A-Za-z0-9]/.test(password),
+  },
+];
+
+export function isCandidatePasswordValid(password) {
+  return CANDIDATE_PASSWORD_RULES.every((rule) => rule.test(password));
+}
+
+const candidatePasswordSchema = z
+  .string()
+  .min(PASSWORD_MIN_LENGTH, 'At least 8 characters required')
+  .refine((value) => /[A-Z]/.test(value), 'Must include an uppercase letter')
+  .refine((value) => /[a-z]/.test(value), 'Must include a lowercase letter')
+  .refine((value) => /\d/.test(value), 'Must include a number')
+  .refine((value) => /[^A-Za-z0-9]/.test(value), 'Must include a special character');
+
 export const authRegisterSchema = z.object({
   fullName: z.string().trim().min(1, 'Name is required').max(100, 'Name is too long'),
   email: z.string().trim().email('Please enter a valid email address'),
-  password: z.string().min(8, '8 characters required'),
+  password: z.string().min(PASSWORD_MIN_LENGTH, '8 characters required'),
+});
+
+export const authCandidateRegisterSchema = authRegisterSchema.extend({
+  password: candidatePasswordSchema,
 });
 
 export const authLoginSchema = z.object({

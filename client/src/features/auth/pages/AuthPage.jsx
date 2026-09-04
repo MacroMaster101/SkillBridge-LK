@@ -9,7 +9,7 @@ import {
   getPostRegisterRoute,
 } from '../services/authService';
 import { isSupabaseConfigured } from '../../../services/supabase';
-import { authLoginSchema, authRegisterSchema } from '../../../lib/validation';
+import { authCandidateRegisterSchema, authLoginSchema, authRegisterSchema } from '../../../lib/validation';
 import { isPasswordValid, PasswordValidation } from '../components/PasswordValidation';
 
 const ROLES = [
@@ -45,7 +45,10 @@ export default function AuthPage({ register = false }) {
     const fullName = formData.get('fullName')?.toString().trim();
 
     const validation = register
-      ? authRegisterSchema.safeParse({ fullName, email, password })
+      ? (role === 'candidate'
+        ? authCandidateRegisterSchema
+        : authRegisterSchema
+      ).safeParse({ fullName, email, password })
       : authLoginSchema.safeParse({ email, password });
 
     if (!validation.success) {
@@ -194,7 +197,7 @@ export default function AuthPage({ register = false }) {
                 <Icon name="eye" size={18} />
               </button>
             </span>
-            <PasswordValidation password={password} register={register} />
+            <PasswordValidation password={password} register={register} role={role} />
           </label>
 
           {error && (
@@ -212,7 +215,7 @@ export default function AuthPage({ register = false }) {
           <button
             className="sb-button sb-auth-submit"
             type="submit"
-            disabled={loading || (password.length > 0 && !isPasswordValid(password, register))}
+            disabled={loading || (password.length > 0 && !isPasswordValid(password, register, role))}
           >
             {loading ? 'Please wait…' : register ? 'Create account' : 'Log in'}
             {!loading && <Icon size={18} />}
