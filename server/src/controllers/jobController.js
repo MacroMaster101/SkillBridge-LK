@@ -1,37 +1,34 @@
-// TODO: Implement job CRUD with Supabase
+import * as jobService from '../services/jobService.js';
 
-export async function getJobs(_req, res) {
-  res.json([
-    {
-      id: 1,
-      title: 'Frontend Development Intern',
-      company: 'Pixel Lanka',
-      category: 'Software / IT',
-      jobType: 'Internship',
-      location: 'Colombo',
-      workMode: 'Hybrid',
-      skills: ['React', 'JavaScript', 'CSS', 'Git'],
-    },
-  ]);
+export async function getJobs(req, res, next) {
+  try {
+    const jobs = await jobService.getActiveJobs({
+      search: req.query.search,
+      category: req.query.category,
+      jobType: req.query.jobType,
+      workMode: req.query.workMode,
+      location: req.query.location,
+    });
+    res.json(jobs);
+  } catch (err) {
+    next(err);
+  }
 }
 
-export async function getJobById(req, res) {
-  res.json({
-    id: req.params.id,
-    title: 'Frontend Development Intern',
-    company: 'Pixel Lanka',
-    category: 'Software / IT',
-    jobType: 'Internship',
-    location: 'Colombo',
-    workMode: 'Hybrid',
-    description: 'Join our team to build modern web applications using React.',
-    skills: ['React', 'JavaScript', 'CSS', 'Git'],
-  });
+export async function getJobById(req, res, next) {
+  try {
+    const job = await jobService.getActiveJobById(req.params.id);
+    res.json(job);
+  } catch (err) {
+    next(err);
+  }
 }
 
-export async function createJob(_req, res) {
-  res.status(501).json({
-    error: 'Not implemented',
-    message: 'POST /api/jobs — create a new job posting',
-  });
+export async function createJob(req, res, next) {
+  try {
+    const job = await jobService.createJob(req.user.id, req.body);
+    res.status(201).json(job);
+  } catch (err) {
+    next(err);
+  }
 }
