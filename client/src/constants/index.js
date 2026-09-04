@@ -15,6 +15,34 @@ export const JOB_TYPES = [
 
 export const WORK_MODES = ['On-site', 'Hybrid', 'Remote'];
 
+export const EDUCATION_LEVELS = [
+  'O/L (Ordinary Level)',
+  'A/L (Advanced Level)',
+  'Diploma',
+  'HND (Higher National Diploma)',
+  "Undergraduate (Bachelor's)",
+  "Postgraduate (Master's)",
+  'Professional qualification',
+  'Other',
+];
+
+export const FIELDS_OF_STUDY = [
+  'Computer Science / IT',
+  'Software Engineering',
+  'Information Technology',
+  'Business / Management',
+  'Accounting / Finance',
+  'Marketing',
+  'Graphic Design / Creative Arts',
+  'Engineering',
+  'Medicine / Health Sciences',
+  'Law',
+  'Education',
+  'Hospitality / Tourism',
+  'Agriculture',
+  'Other',
+];
+
 export const JOB_CATEGORIES = [
   'Software / IT',
   'Graphic Design',

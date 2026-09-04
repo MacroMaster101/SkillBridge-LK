@@ -12,8 +12,13 @@ export const updateProfileSchema = z.object({
   field_of_study: z.string().optional(),
   location: z.string().optional(),
   preferred_work_mode: z.enum(["On-site", "Hybrid", "Remote"]).optional(),
+  preferred_job_types: z.array(z.string()).optional(),
 });
 
 export const updateSkillsSchema = z.object({
-  skillIds: z.array(z.number().int()).min(1, "Please select at least one skill."),
-});
+  skillIds: z.array(z.number().int()).min(1, 'Please select at least one skill.').optional(),
+  skillNames: z.array(z.string().trim().min(1).max(80)).min(1, 'Please select at least one skill.').optional(),
+}).refine(
+  (data) => (data.skillIds?.length ?? 0) > 0 || (data.skillNames?.length ?? 0) > 0,
+  { message: 'Please select at least one skill.' },
+);

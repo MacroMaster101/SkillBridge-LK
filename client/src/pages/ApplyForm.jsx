@@ -1,20 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getCandidate } from '../lib/candidateStorage';
 import { supabase } from '../lib/supabaseClient';
-import { mockJobs } from '../data/mockJobs';
+import { jobService } from '../features/jobs/services/jobService';
 import Button from '../components/Button';
 
 export default function ApplyForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const candidate = getCandidate();
-  const job = mockJobs.find(j => j.id === id);
-
+  const [job, setJob] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    jobService.getById(id)
+      .then((response) => setJob(response.data))
+      .catch(() => setJob(null))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-600">Loading job...</p>
+      </div>
+    );
+  }
 
   if (!job) {
     return (
@@ -50,7 +65,7 @@ export default function ApplyForm() {
         job_id: job.id,
         candidate_name: candidate.name,
         message: message.trim() || null,
-        status: 'Applied'
+        status: 'Applied',
       };
 
       if (supabase) {
@@ -64,7 +79,7 @@ export default function ApplyForm() {
         applications.push({
           ...applicationData,
           id: Date.now().toString(),
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         });
         localStorage.setItem('applications', JSON.stringify(applications));
       }
@@ -115,7 +130,7 @@ export default function ApplyForm() {
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium text-gray-500">JOB TYPE</p>
-            <p className="text-gray-900">{job.job_type}</p>
+            <p className="text-gray-900">{job.jobType}</p>
           </div>
         </div>
       </div>

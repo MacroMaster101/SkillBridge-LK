@@ -1,17 +1,62 @@
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Action, Eyebrow, Icon, OpportunityCard, Tags } from '../../../components/PublicUI';
-import { publicJobs } from '../data/publicJobs';
+import { jobService } from '../services/jobService';
+import { enrichJob } from '../../../lib/jobDisplay';
 
 export default function JobDetailsPage() {
   const { id } = useParams();
-  const job = publicJobs.find((item) => String(item.id) === id);
+  const [job, setJob] = useState(null);
+  const [relatedJobs, setRelatedJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!job) {
+  useEffect(() => {
+    let cancelled = false;
+
+    jobService.getById(id)
+      .then((response) => {
+        if (cancelled) return;
+        setJob(enrichJob(response.data));
+        setNotFound(false);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        if (error.response?.status === 404) setNotFound(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [id]);
+
+  useEffect(() => {
+    jobService.getAll()
+      .then((response) => {
+        const others = (response.data || [])
+          .map(enrichJob)
+          .filter((item) => String(item.id) !== String(id))
+          .slice(0, 3);
+        setRelatedJobs(others);
+      })
+      .catch(() => {});
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="sb-container sb-empty">
+        <p>Loading opportunity…</p>
+      </div>
+    );
+  }
+
+  if (notFound || !job) {
     return (
       <div className="sb-container sb-empty sb-not-found">
         <Icon name="search" size={36} />
         <h1>That opportunity is not here.</h1>
-        <p>The link may be out of date. Browse the current sample listings instead.</p>
+        <p>The link may be out of date. Browse current listings instead.</p>
         <Action to="/jobs">Back to opportunities <Icon /></Action>
       </div>
     );
@@ -47,21 +92,8 @@ export default function JobDetailsPage() {
 
       <div className="sb-container sb-detail-layout">
         <article className="sb-detail-body">
-          <p className="sb-sample-notice">
-            <Icon name="spark" size={16} />
-            Sample listing. Applications are not open for this role — it is here to show how a
-            vacancy page works.
-          </p>
-
           <h2>About the role</h2>
-          <p>{job.description}</p>
-
-          <h2>What you would be doing</h2>
-          <ul className="sb-check-list">
-            {job.responsibilities.map((item) => (
-              <li key={item}><Icon name="check" size={18} />{item}</li>
-            ))}
-          </ul>
+          <p style={{ whiteSpace: 'pre-line' }}>{job.description}</p>
 
           <h2>Skills this role asks for</h2>
           <p>
@@ -107,22 +139,24 @@ export default function JobDetailsPage() {
         </aside>
       </div>
 
-      <section className="sb-opportunities">
-        <div className="sb-container sb-section">
-          <div className="sb-section-heading">
-            <div>
-              <Eyebrow>Keep looking</Eyebrow>
-              <h2>Other roles open to beginners.</h2>
+      {relatedJobs.length > 0 && (
+        <section className="sb-opportunities">
+          <div className="sb-container sb-section">
+            <div className="sb-section-heading">
+              <div>
+                <Eyebrow>Keep looking</Eyebrow>
+                <h2>Other roles open to beginners.</h2>
+              </div>
+              <Action secondary to="/jobs">View all <Icon /></Action>
             </div>
-            <Action secondary to="/jobs">View all <Icon /></Action>
+            <div className="sb-job-grid">
+              {relatedJobs.map((item) => (
+                <OpportunityCard job={item} key={item.id} />
+              ))}
+            </div>
           </div>
-          <div className="sb-job-grid">
-            {publicJobs.filter((item) => item.id !== job.id).slice(0, 3).map((item) => (
-              <OpportunityCard job={item} key={item.id} />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
     </>
   );
 }

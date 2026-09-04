@@ -1,3 +1,7 @@
+import { applySchema } from '../validators/schemas.js';
+import * as applicationService from '../services/applicationService.js';
+
+export async function applyToJob(req, res, next) {
 import { applySchema } from "../validators/schemas.js";
 import * as service from "../services/applicationService.js";
 
@@ -7,6 +11,25 @@ export async function applyToJob(req, res) {
   if (!parsed.success) {
     return res.status(400).json({ message: parsed.error.issues[0].message });
   }
+
+  try {
+    const application = await applicationService.applyToJob(
+      req.params.jobId,
+      req.user.id,
+      parsed.data.message,
+    );
+    res.status(201).json(application);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getMyApplications(req, res, next) {
+  try {
+    const applications = await applicationService.getMyApplications(req.user.id);
+    res.json(applications);
+  } catch (err) {
+    next(err)
   try {
     const result = await service.applyToJob(
       req.user.id, Number(req.params.jobId), parsed.data.message
@@ -24,6 +47,7 @@ export async function getMyApplications(req, res) {
     res.json(apps);
   } catch (e) {
     res.status(500).json({ message: "Unable to load applications." });
+
   }
 }
 

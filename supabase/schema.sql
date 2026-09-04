@@ -17,6 +17,7 @@ CREATE TABLE candidate_profiles (
     field_of_study TEXT,
     location TEXT,
     preferred_work_mode TEXT,
+    preferred_job_types TEXT[] DEFAULT ARRAY[]::TEXT[],
     onboarding_completed BOOLEAN DEFAULT FALSE
 );
 
