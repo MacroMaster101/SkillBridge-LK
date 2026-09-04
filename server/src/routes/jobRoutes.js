@@ -12,6 +12,9 @@ router.get('/', jobController.getJobs);
 router.get('/:id', jobController.getJobById);
 
 // Employer — create a job
+// Browsing is public — the landing and jobs pages rely on it without a session.
+router.get('/', jobController.getJobs);
+router.get('/:id', jobController.getJobById);
 router.post('/', authenticate, requireRole('employer'), validate(jobSchema), jobController.createJob);
 
 // Feature 4 — Candidate applies to a job

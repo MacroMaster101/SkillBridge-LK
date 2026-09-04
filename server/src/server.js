@@ -13,6 +13,17 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Hitting the bare origin — in a browser preview or on the deployed URL —
+// should say what this service is rather than Express's "Cannot GET /".
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'SkillBridge LK API',
+    status: 'ok',
+    health: '/health',
+    endpoints: ['/api/jobs', '/api/skills', '/api/candidates', '/api/employers', '/api/applications', '/api/admin'],
+  });
+});
+
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', message: 'SkillBridge LK API is running' });
 });

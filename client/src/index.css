@@ -2,8 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
+/* SkillBridge LK Theme — Landing Page Colors */
+:root {
+  /* Ink — the board, the display type, the deep ground */
+  --ink: #14202e;
+  --ink-2: #1e2e42;
+  --ink-soft: #5a6b80;
+
+  /* Paper — cream and off-white palette */
+  --paper: #edefe8;
+  --paper-light: #FDF0E0;
+  --paper-2: #e3e7dd;
+  --card: #fbfcf9;
+
+  /* Signal — Sri Lankan route-board colour */
+  --marigold: #e9a227;
+  --petrol: #0f6357;
+  --petrol-soft: #d7e6e0;
+  --petrol-ink: #144e46;
+  --madder: #c2462c;
+
+  /* Buttons */
+  --button-bg: #FDF0E0;
+
+  /* Status colors */
+  --color-excellent: #0f6357;
+  --color-good: #0f6357;
+  --color-partial: #e9a227;
+  --color-low: #5a6b80;
+  --color-applied: #5a6b80;
+  --color-review: #e9a227;
+  --color-shortlisted: #0f6357;
+  --color-rejected: #c2462c;
+  --color-hired: #0f6357;
+
+  /* Fonts */
+  --font-display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
+}
+
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply antialiased;
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    color: var(--ink);
+  }
+
+  h1 { @apply text-4xl md:text-5xl; }
+  h2 { @apply text-3xl md:text-4xl; }
+  h3 { @apply text-xl md:text-2xl; }
+
+  /* Buttons are owned by the Button component, not a global element rule —
+     a bare element selector here silently fought every component class. */
 }

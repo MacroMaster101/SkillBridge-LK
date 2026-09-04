@@ -1,43 +1,55 @@
 import { Link } from 'react-router-dom';
 import Button from '../../../components/Button';
-import Input from '../../../components/Input';
-import { JOB_CATEGORIES, JOB_TYPES, WORK_MODES } from '../../../constants';
+import { Icon, InfoNote, PageHeader, SectionCard, SelectField, TextField, TextareaField } from '../../../components/AppUI';
+import { JOB_CATEGORIES } from '../../../constants';
 
 export default function EmployerSetupPage() {
-  return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-bold text-gray-900">Set Up Your Business Profile</h1>
-      <p className="mt-2 text-gray-600">
-        Tell us about your business so you can start posting jobs.
-      </p>
+  // TODO: Submit to API — POST /api/employers
+  const handleSubmit = (event) => event.preventDefault();
 
-      {/* TODO: Implement employer profile creation — POST /api/employers */}
-      <form className="mt-8 space-y-4 rounded-xl border bg-white p-6 shadow-sm" onSubmit={(e) => e.preventDefault()}>
-        <Input label="Business Name" name="companyName" required />
-        <Input label="Contact Person" name="contactPerson" required />
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Business Category</label>
-          <select className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-            {JOB_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Description</label>
-          <textarea
-            rows={4}
-            className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-            placeholder="Brief description of your business..."
-          />
-        </div>
-        <Input label="Location" name="location" />
-        <Input label="Contact Email" type="email" name="contactEmail" />
-        <Input label="Phone Number" name="phone" />
-        <div className="flex justify-end">
-          <Link to="/employer/dashboard">
-            <Button type="submit">Save & Continue</Button>
-          </Link>
+  return (
+    <div className="mx-auto flex max-w-3xl flex-col gap-8">
+      <PageHeader
+        eyebrow="Business profile"
+        title="Tell candidates who they would be joining."
+        lead="This appears on every vacancy you post, so applicants know who is hiring."
+      />
+
+      <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+        <SectionCard title="Your business">
+          <div className="flex flex-col gap-4">
+            <TextField label="Business name" name="companyName" placeholder="e.g. Pixel Lanka" required />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField label="Contact person" name="contactPerson" placeholder="Who applicants hear from" required />
+              <SelectField label="Business category" name="category" options={JOB_CATEGORIES} />
+            </div>
+            <TextareaField
+              label="About the business"
+              name="description"
+              rows={4}
+              placeholder="What you do, how big the team is, what it is like to work there."
+              hint="A couple of sentences is plenty."
+            />
+          </div>
+        </SectionCard>
+
+        <SectionCard title="How to reach you">
+          <div className="flex flex-col gap-4">
+            <TextField label="Location" name="location" placeholder="e.g. Colombo" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField label="Contact email" type="email" name="contactEmail" placeholder="hiring@yourbusiness.lk" />
+              <TextField label="Phone number" name="phone" placeholder="e.g. 011 234 5678" />
+            </div>
+          </div>
+        </SectionCard>
+
+        <InfoNote>
+          Contact details are used for applicant correspondence and are not shown publicly on job listings.
+        </InfoNote>
+
+        <div className="flex flex-wrap justify-end gap-3">
+          <Link to="/employer/dashboard"><Button variant="secondary">Cancel</Button></Link>
+          <Button type="submit">Save profile <Icon size={15} /></Button>
         </div>
       </form>
     </div>
