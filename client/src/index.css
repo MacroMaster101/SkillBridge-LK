@@ -1,9 +1,173 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-bg: #f8fafc;
+  --color-card: #ffffff;
+  --color-text: #1e293b;
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
 
-@layer base {
-  body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+  --color-excellent: #16a34a;
+  --color-good: #2563eb;
+  --color-partial: #d97706;
+  --color-low: #94a3b8;
+
+  --color-applied: #64748b;
+  --color-review: #d97706;
+  --color-shortlisted: #2563eb;
+  --color-rejected: #dc2626;
+  --color-hired: #16a34a;
+
+  --radius: 10px;
+  --spacing: 16px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--spacing);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing);
+  background: var(--color-card);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navbar a {
+  margin-right: var(--spacing);
+  color: var(--color-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.navbar a.active { color: var(--color-primary); }
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--spacing);
+  margin-bottom: 12px;
+}
+
+.job-card { cursor: pointer; transition: box-shadow 0.15s; }
+.job-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+}
+
+.badge-excellent { background: var(--color-excellent); }
+.badge-good { background: var(--color-good); }
+.badge-partial { background: var(--color-partial); }
+.badge-low { background: var(--color-low); }
+
+.status-applied { background: var(--color-applied); }
+.status-under-review { background: var(--color-review); }
+.status-shortlisted { background: var(--color-shortlisted); }
+.status-rejected { background: var(--color-rejected); }
+.status-hired { background: var(--color-hired); }
+
+.btn {
+  display: inline-block;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover { background: var(--color-primary-dark); }
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  margin-bottom: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.field-error {
+  color: var(--color-rejected);
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.filters-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing);
+}
+
+.filters-bar input,
+.filters-bar select {
+  flex: 1;
+  min-width: 150px;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+h2 {
+  font-size: 1.3rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .navbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .navbar a { margin-right: 12px; }
+  .filters-bar { flex-direction: column; }
+  .filters-bar input,
+  .filters-bar select {
+    min-width: 100%;
   }
 }
